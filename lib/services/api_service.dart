@@ -4,7 +4,7 @@ import '../models/order_model.dart';
 
 class ApiService {
   // Use your computer IP address (same one used in MongoDB Compass/Postman)
-  static const String baseUrl = 'http://127.0.0.1:5000';
+  static const String baseUrl = 'http://127.0.0.1:5000/api';
 
   static Future<List<Order>> fetchOrders() async {
     final response = await http.get(Uri.parse('$baseUrl/orders'));
