@@ -15,13 +15,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'The Flutter Way - Foodly UI Kit',
       theme: ThemeData(
-          useMaterial3: false,
-        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xFF603D35)),
-
+        useMaterial3: false,
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF603D35)),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-           backgroundColor: Color(0xFF603D35),
-
+            backgroundColor: const Color(0xFF603D35),
             foregroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 40),
             shape: RoundedRectangleBorder(
@@ -31,7 +29,6 @@ class MyApp extends StatelessWidget {
         ),
         textTheme: const TextTheme(
           bodyMedium: TextStyle(color: Color(0xFF603D35)),
- 
           bodySmall: TextStyle(color: Color(0xFF603D35)),
         ),
         inputDecorationTheme: const InputDecorationTheme(

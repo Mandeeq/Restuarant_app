@@ -72,9 +72,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 List<Map<String, dynamic>> demoData = [
   {
     "illustration": "assets/Illustrations/Illustrations_1.svg",
-    "title": "All your favorites",
+    "title": "Get your favorite meal",
     "text":
-        "Order from the best local restaurants \nwith easy, on-demand delivery.",
+        "Order from the best restaurant around \nwith easy, on-demand delivery.",
   },
   {
     "illustration": "assets/Illustrations/Illustrations_2.svg",

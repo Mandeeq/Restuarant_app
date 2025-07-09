@@ -2,8 +2,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import '../../components/welcome_text.dart';
 import '../../constants.dart';
+import '../../services/api_service.dart';
 import 'sign_up_screen.dart';
 import 'forgot_password_screen.dart';
+import '../../entry_point.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -26,18 +28,36 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      
-      // Simulate API call
-      Future.delayed(const Duration(seconds: 1), () {
-        setState(() => _isLoading = false);
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+
+      try {
+        await ApiService.login(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
         );
-      });
+
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const EntryPoint()),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Login failed: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
     }
   }
 
@@ -46,7 +66,7 @@ class _SignInScreenState extends State<SignInScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Sign In',
+          'Log In',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -68,7 +88,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 const SizedBox(height: 24),
                 const WelcomeText(
                   title: 'Welcome to Qaffee Point',
-                  text: 'Enter your credentials to enjoy our delicious offerings',
+                  text:
+                      'Enter your credentials to enjoy our delicious offerings',
                 ),
                 const SizedBox(height: 32),
 
@@ -84,7 +105,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return null; // No visible error
+                      return 'Email is required';
+                    }
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
+                      return 'Please enter a valid email';
                     }
                     return null;
                   },
@@ -103,9 +128,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     prefixIcon: const Icon(Icons.lock_outline),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _showPassword 
-                          ? Icons.visibility 
-                          : Icons.visibility_off,
+                        _showPassword ? Icons.visibility : Icons.visibility_off,
                       ),
                       onPressed: () {
                         setState(() {
@@ -116,7 +139,10 @@ class _SignInScreenState extends State<SignInScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return null; // No visible error
+                      return 'Password is required';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
                     }
                     return null;
                   },
@@ -158,25 +184,25 @@ class _SignInScreenState extends State<SignInScreen> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    onPressed: () {
-                      if (_emailController.text.isNotEmpty && 
-                          _passwordController.text.isNotEmpty) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen(),
+                    onPressed: _isLoading ? null : _submitForm,
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'SIGN IN',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
-                        );
-                      }
-                    },
-                    child: const Text(
-                      'SIGN IN',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -233,22 +259,6 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Qaffee Point Home'),
-      ),
-      body: const Center(
-        child: Text('Welcome to Qaffee Point!'),
       ),
     );
   }

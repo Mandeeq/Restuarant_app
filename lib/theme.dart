@@ -5,18 +5,15 @@ import 'constants.dart';
 ThemeData buildThemeData() {
   return ThemeData(
     primaryColor: accentColor,
-     useMaterial3: false,
+    useMaterial3: false,
 
     scaffoldBackgroundColor: Colors.white,
     fontFamily: "SF Pro Text",
     // textTheme: textTheme().apply(displayColor: titleColor),
     appBarTheme: const AppBarTheme(
-     
       backgroundColor: Color(0xFF603D35),
       elevation: 0,
       centerTitle: true,
-     
-
       iconTheme: IconThemeData(color: Colors.black),
     ),
     inputDecorationTheme: inputDecorationTheme,
@@ -33,9 +30,8 @@ final InputDecorationTheme inputDecorationTheme = InputDecorationTheme(
   border: kDefaultOutlineInputBorder,
   enabledBorder: kDefaultOutlineInputBorder,
   focusedBorder: kDefaultOutlineInputBorder.copyWith(
-      borderSide: BorderSide(
-       color: Color(0xFF603D35),
-
+      borderSide: const BorderSide(
+    color: Color(0xFF603D35),
   )),
   errorBorder: kDefaultOutlineInputBorder.copyWith(
     borderSide: kErrorBorderSide,
