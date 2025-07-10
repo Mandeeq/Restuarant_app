@@ -111,9 +111,13 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
+    // Debug print to help trace issues
+    print('Order JSON: ' + json.toString());
     return Order(
       id: json['_id'],
-      userId: json['user'],
+      userId: json['user'] is String
+          ? json['user']
+          : (json['user'] != null ? json['user']['_id'] : null),
       items: (json['items'] as List<dynamic>)
           .map((item) => OrderItem.fromJson(item))
           .toList(),

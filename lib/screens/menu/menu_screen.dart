@@ -26,6 +26,8 @@ class _MenuScreenState extends State<MenuScreen> {
     'special',
   ];
 
+  static const String backendImageUrl = 'http://127.0.0.1:5000/images/food.jpg';
+
   @override
   void initState() {
     super.initState();
@@ -167,14 +169,14 @@ class _MenuScreenState extends State<MenuScreen> {
       itemCount: _menuItems.length,
       itemBuilder: (context, index) {
         final item = _menuItems[index];
+        final imageUrl =
+            (item.imageUrl.isNotEmpty) ? item.imageUrl : backendImageUrl;
         return Padding(
           padding: const EdgeInsets.only(bottom: defaultPadding),
           child: ItemCard(
             title: item.name,
             description: item.description,
-            image: item.imageUrl.isNotEmpty
-                ? item.imageUrl
-                : 'assets/images/featured _items_1.png',
+            image: imageUrl,
             foodType: item.category,
             price: item.price,
             priceRange: '\$' * (item.price ~/ 5 + 1),

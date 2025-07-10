@@ -20,6 +20,23 @@ class ItemCard extends StatelessWidget {
   final double? price;
   final VoidCallback press;
 
+  Widget buildImage(String? imageUrl) {
+    const fallbackUrl = 'http://127.0.0.1:5000/images/food.jpg';
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return Image.network(fallbackUrl, fit: BoxFit.cover);
+    }
+    if (imageUrl.startsWith('http')) {
+      return Image.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.network(fallbackUrl, fit: BoxFit.cover);
+        },
+      );
+    }
+    return Image.asset(imageUrl, fit: BoxFit.cover);
+  }
+
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.labelLarge!.copyWith(
@@ -39,10 +56,7 @@ class ItemCard extends StatelessWidget {
                 aspectRatio: 1,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  child: Image.asset(
-                    image!,
-                    fit: BoxFit.cover,
-                  ),
+                  child: buildImage(image),
                 ),
               ),
               const SizedBox(width: defaultPadding),
