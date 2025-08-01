@@ -6,13 +6,15 @@ import '../models/user_model.dart';
 
 class ApiService {
   // Use your computer IP address (same one used in MongoDB Compass/Postman)
-  static const String baseUrl = 'http://127.0.0.1:5000/api';
+  static const String baseUrl = "http://192.168.83.93:5000";  // ✅ Use your actual IP + port
+
 
   // Store authentication token
   static String? _authToken;
   static User? _currentUser;
 
   // Getters
+  
   static String? get authToken => _authToken;
   static User? get currentUser => _currentUser;
   static bool get isAuthenticated => _authToken != null;
@@ -71,14 +73,15 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/login'),
-      headers: _headers,
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
-    );
+   final response = await http.post(
+  Uri.parse('$baseUrl/api/auth/login'),
+  headers: {"Content-Type": "application/json"},
+  body: jsonEncode({
+    "email": email,
+    "password": password,
+  }),
+);
+
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -129,7 +132,7 @@ class ApiService {
     if (page != null) queryParams['page'] = page.toString();
 
     final uri =
-        Uri.parse('$baseUrl/menu').replace(queryParameters: queryParams);
+        Uri.parse('$baseUrl/api/menu').replace(queryParameters: queryParams);
     final response = await http.get(uri, headers: _headers);
 
     if (response.statusCode == 200) {
@@ -143,7 +146,7 @@ class ApiService {
 
   static Future<MenuItem> getMenuItemById(String id) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/menu/$id'),
+      Uri.parse('$baseUrl/api/menu/$id'),
       headers: _headers,
     );
 
@@ -162,7 +165,7 @@ class ApiService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/orders'),
+      Uri.parse('$baseUrl/api/orders'), // ✅
       headers: _headers,
     );
 
@@ -180,7 +183,8 @@ class ApiService {
     }
 
     final response = await http.post(
-      Uri.parse('$baseUrl/orders'),
+     Uri.parse('$baseUrl/api/orders') ,// ✅
+
       headers: _headers,
       body: jsonEncode(order.toJson()),
     );
@@ -200,7 +204,8 @@ class ApiService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/orders/$id'),
+     Uri.parse('$baseUrl/api/orders'), // ✅
+
       headers: _headers,
     );
 
@@ -218,7 +223,7 @@ class ApiService {
     }
 
     final response = await http.post(
-      Uri.parse('$baseUrl/orders/$id/cancel'),
+      Uri.parse('$baseUrl/api/orders/$id/cancel'),
       headers: _headers,
     );
 
@@ -238,7 +243,7 @@ class ApiService {
     }
 
     final response = await http.post(
-      Uri.parse('$baseUrl/orders/$id/rate'),
+      Uri.parse('$baseUrl/api/orders/$id/rate'),
       headers: _headers,
       body: jsonEncode({
         'rating': rating,
@@ -262,7 +267,7 @@ class ApiService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/orders/admin/all'),
+      Uri.parse('$baseUrl/api/orders/admin/all'),
       headers: _headers,
     );
 
@@ -280,7 +285,7 @@ class ApiService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/orders/admin/pending'),
+      Uri.parse('$baseUrl/api/orders/admin/pending'),
       headers: _headers,
     );
 
@@ -298,7 +303,7 @@ class ApiService {
     }
 
     final response = await http.put(
-      Uri.parse('$baseUrl/orders/$id/status'),
+      Uri.parse('$baseUrl/api/orders/$id/status'),
       headers: _headers,
       body: jsonEncode({'status': status}),
     );

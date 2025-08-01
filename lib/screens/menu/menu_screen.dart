@@ -3,6 +3,7 @@ import '../../constants.dart';
 import '../../models/menu_item_model.dart';
 import '../../services/api_service.dart';
 import '../../components/cards/iteam_card.dart';
+import '../../screens/cart_page.dart'; // 👈 Make sure this exists
 
 class MenuScreen extends StatefulWidget {
   const MenuScreen({super.key});
@@ -13,6 +14,7 @@ class MenuScreen extends StatefulWidget {
 
 class _MenuScreenState extends State<MenuScreen> {
   List<MenuItem> _menuItems = [];
+  final List<String> cart = []; // 👈 Cart state
   bool _isLoading = true;
   String? _error;
   String _selectedCategory = 'all';
@@ -181,14 +183,21 @@ class _MenuScreenState extends State<MenuScreen> {
             price: item.price,
             priceRange: '\$' * (item.price ~/ 5 + 1),
             press: () {
-              // Navigate to item details or add to cart
+              // Add to cart and show SnackBar
+              cart.add(item.name);
+
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Added ${item.name} to cart'),
                   action: SnackBarAction(
                     label: 'View Cart',
                     onPressed: () {
-                      // Navigate to cart
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CartPage(cartItems: cart),
+                        ),
+                      );
                     },
                   ),
                 ),
