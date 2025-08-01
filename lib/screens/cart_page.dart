@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'checkout_page.dart'; // adjust path if needed
+import 'checkout_page.dart';
 
 class CartPage extends StatefulWidget {
   final List<String> cartItems;
@@ -12,6 +12,7 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   late List<String> items;
+
   final Map<String, double> itemPrices = {
     'Espresso': 3.50,
     'Cappuccino': 4.00,
@@ -40,7 +41,7 @@ class _CartPageState extends State<CartPage> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
         ),
-        backgroundColor: Colors.brown[700],
+        backgroundColor: Colors.brown[600],
       ),
     );
   }
@@ -61,11 +62,16 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.brown[50],
       appBar: AppBar(
-        title: const Text('Your Coffee Cart',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Your Coffee Cart',
+          style: TextStyle(
+              fontWeight: FontWeight.w700, fontSize: 20, color: Colors.white),
+        ),
         centerTitle: true,
         backgroundColor: Colors.brown[700],
+        elevation: 3,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Column(
@@ -76,50 +82,62 @@ class _CartPageState extends State<CartPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.coffee_outlined,
-                            size: 60, color: Colors.brown[300]),
-                        const SizedBox(height: 16),
-                        const Text('Your cart is empty',
-                            style: TextStyle(fontSize: 18)),
+                        Icon(Icons.local_cafe_outlined,
+                            size: 80, color: Colors.brown[300]),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Your cart is empty',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w600),
+                        ),
                         const SizedBox(height: 8),
-                        Text('Add some delicious coffee!',
-                            style: TextStyle(
-                                fontSize: 14, color: Colors.grey[600])),
+                        Text(
+                          'Start brewing your order!',
+                          style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.brown[400],
+                              fontStyle: FontStyle.italic),
+                        ),
                       ],
                     ),
                   )
                 : ListView.builder(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     itemCount: items.length,
                     itemBuilder: (context, index) => Card(
-                      margin: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
-                      elevation: 2,
+                      elevation: 3,
+                      shadowColor: Colors.brown[100],
+                      margin: const EdgeInsets.symmetric(vertical: 8),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
                       ),
                       child: ListTile(
+                        contentPadding: const EdgeInsets.all(12),
                         leading: Container(
                           width: 50,
                           height: 50,
                           decoration: BoxDecoration(
                             color: Colors.brown[100],
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(Icons.coffee,
-                              color: Colors.brown[700], size: 30),
+                          child: Icon(Icons.local_cafe,
+                              color: Colors.brown[700], size: 28),
                         ),
                         title: Text(
                           items[index],
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         subtitle: Text(
                           '\$${(itemPrices[items[index]] ?? 0).toStringAsFixed(2)}',
                           style: TextStyle(
-                              color: Colors.brown[700],
+                              color: Colors.brown[600],
                               fontWeight: FontWeight.w600),
                         ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.delete_outline,
+                              color: Colors.red),
                           onPressed: () => removeItem(index),
                         ),
                       ),
@@ -127,58 +145,66 @@ class _CartPageState extends State<CartPage> {
                   ),
           ),
           if (items.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Total (${items.length} items)',
-                          style: const TextStyle(fontSize: 16)),
-                      Text('\$${calculateTotal().toStringAsFixed(2)}',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.brown[700])),
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    left: 20, right: 20, top: 16, bottom: 24), // bottom increased
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(24)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.brown.shade100,
+                        blurRadius: 10,
+                        offset: const Offset(0, -2),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: checkout,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown[700],
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 2,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total (${items.length} items)',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            '\$${calculateTotal().toStringAsFixed(2)}',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.brown[700]),
+                          ),
+                        ],
                       ),
-                      child: const Text('Checkout',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                    ),
+                      const SizedBox(height: 12),
+                      ElevatedButton(
+                        onPressed: checkout,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.brown[700],
+                          elevation: 3,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: const Text('Proceed to Checkout',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
         ],
