@@ -171,6 +171,24 @@ class ApiService {
     }
   }
 
+  static Future<List<Map<String, dynamic>>> getMenuCategories() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/menu/categories'),
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['success'] && data['data'] != null) {
+        return List<Map<String, dynamic>>.from(data['data']['categories']);
+      } else {
+        throw Exception('Failed to load categories');
+      }
+    } else {
+      throw Exception('Failed to load categories');
+    }
+  }
+
   // Order endpoints
   static Future<List<Order>> fetchOrders() async {
     if (!isAuthenticated) {
