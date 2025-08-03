@@ -148,7 +148,10 @@ class _CartPageState extends State<CartPage> {
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.only(
-                    left: 20, right: 20, top: 16, bottom: 24), // bottom increased
+                    left: 20,
+                    right: 20,
+                    top: 16,
+                    bottom: 24), // bottom increased
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,

@@ -7,7 +7,7 @@ import 'screens/home/home_screen.dart';
 import 'screens/menu/menu_screen.dart';
 import 'screens/orderDetails/order_details_screen.dart';
 import 'screens/profile/profile_screen.dart';
-import 'screens/cart_page.dart';
+import 'screens/payment/cart_page.dart';
 
 class EntryPoint extends StatefulWidget {
   const EntryPoint({super.key});

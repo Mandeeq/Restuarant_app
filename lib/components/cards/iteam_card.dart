@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
 import '../../constants.dart';
-
+import '../../utils/image_utils.dart';
 import '../small_dot.dart';
 
 class ItemCard extends StatelessWidget {
@@ -21,20 +20,30 @@ class ItemCard extends StatelessWidget {
   final VoidCallback press;
 
   Widget buildImage(String? imageUrl) {
-    const fallbackUrl = 'http://127.0.0.1:5000/images/food.jpg';
-    if (imageUrl == null || imageUrl.isEmpty) {
-      return Image.network(fallbackUrl, fit: BoxFit.cover);
-    }
-    if (imageUrl.startsWith('http')) {
-      return Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Image.network(fallbackUrl, fit: BoxFit.cover);
-        },
-      );
-    }
-    return Image.asset(imageUrl, fit: BoxFit.cover);
+    final fallbackUrl = ImageUtils.getDefaultImageUrl();
+    final fullImageUrl = ImageUtils.getImageUrl(imageUrl);
+
+    return Image.network(
+      fullImageUrl,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Image.network(fallbackUrl, fit: BoxFit.cover);
+      },
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: Colors.grey[300],
+          child: Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override

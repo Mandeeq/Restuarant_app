@@ -3,7 +3,8 @@ import '../../constants.dart';
 import '../../models/menu_item_model.dart';
 import '../../services/api_service.dart';
 import '../../components/cards/iteam_card.dart';
-import '../../screens/cart_page.dart';
+import '../payment/cart_page.dart';
+import '../../utils/image_utils.dart';
 
 class MenuScreen extends StatefulWidget {
   final List<String> cartItems; // ✅ Receive cart items from EntryPoint
@@ -34,7 +35,7 @@ class _MenuScreenState extends State<MenuScreen> {
     'special',
   ];
 
-  static const String backendImageUrl = 'http://127.0.0.1:5000/images/food.jpg';
+  // Using ImageUtils for consistent image URL handling
 
   @override
   void initState() {
@@ -177,14 +178,12 @@ class _MenuScreenState extends State<MenuScreen> {
       itemCount: _menuItems.length,
       itemBuilder: (context, index) {
         final item = _menuItems[index];
-        final imageUrl =
-            (item.imageUrl.isNotEmpty) ? item.imageUrl : backendImageUrl;
         return Padding(
           padding: const EdgeInsets.only(bottom: defaultPadding),
           child: ItemCard(
             title: item.name,
             description: item.description,
-            image: imageUrl,
+            image: item.imageUrl,
             foodType: item.category,
             price: item.price,
             priceRange: '\$' * (item.price ~/ 5 + 1),

@@ -1,3 +1,5 @@
+import '../utils/image_utils.dart';
+
 class MenuItem {
   final String id;
   final String name;
@@ -28,6 +30,9 @@ class MenuItem {
   });
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
+    // Construct full image URL from backend using utility
+    String imageUrl = ImageUtils.getImageUrl(json['imageUrl']);
+
     return MenuItem(
       id: json['_id'],
       name: json['name'],
@@ -37,7 +42,7 @@ class MenuItem {
           : json['price'].toDouble(),
       category: json['category'],
       dietaryTags: List<String>.from(json['dietaryTags'] ?? []),
-      imageUrl: json['imageUrl'] ?? '',
+      imageUrl: imageUrl,
       isFeatured: json['isFeatured'] ?? false,
       preparationTime: json['preparationTime'] ?? 15,
       available: json['available'] ?? true,

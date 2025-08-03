@@ -3,6 +3,7 @@ import '../../findRestaurants/find_restaurants_screen.dart';
 import '../../../constants.dart';
 import '../../../services/api_service.dart';
 import '../forgot_password_screen.dart';
+import '../../admin/admin_dashboard_screen.dart';
 
 class SignInForm extends StatefulWidget {
   const SignInForm({super.key});
@@ -58,19 +59,30 @@ class _SignInFormState extends State<SignInForm> {
     setState(() => _isLoading = true);
 
     try {
-      await ApiService.login(
+      final response = await ApiService.login(
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
 
       if (mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const FindRestaurantsScreen(),
-          ),
-          (_) => true,
-        );
+        // Check if user is admin and redirect accordingly
+        if (response.user.role == 'admin') {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const AdminDashboardScreen(),
+            ),
+            (_) => true,
+          );
+        } else {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const FindRestaurantsScreen(),
+            ),
+            (_) => true,
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
