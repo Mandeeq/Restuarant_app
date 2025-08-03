@@ -4,7 +4,8 @@ class User {
   final String email;
   final String? phone;
   final String? role;
-  final bool isVerified;
+  final bool phoneVerified;
+  final bool emailVerified;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -14,7 +15,8 @@ class User {
     required this.email,
     this.phone,
     this.role = 'customer',
-    this.isVerified = false,
+    this.phoneVerified = false,
+    this.emailVerified = false,
     this.createdAt,
     this.updatedAt,
   });
@@ -26,7 +28,8 @@ class User {
       email: json['email'],
       phone: json['phone'],
       role: json['role'] ?? 'customer',
-      isVerified: json['isVerified'] ?? false,
+      phoneVerified: json['phoneVerified'] ?? false,
+      emailVerified: json['emailVerified'] ?? false,
       createdAt:
           json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
       updatedAt:
@@ -41,7 +44,8 @@ class User {
       'email': email,
       if (phone != null) 'phone': phone,
       'role': role,
-      'isVerified': isVerified,
+      'phoneVerified': phoneVerified,
+      'emailVerified': emailVerified,
     };
   }
 }
