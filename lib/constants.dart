@@ -41,9 +41,8 @@ const kErrorBorderSide = BorderSide(color: Colors.red, width: 1);
 // Validator
 final passwordValidator = MultiValidator([
   RequiredValidator(errorText: 'Password is required'),
-  MinLengthValidator(8, errorText: 'Password must be at least 8 digits long'),
-  PatternValidator(r'(?=.*?[#?!@$%^&*-/])',
-      errorText: 'Passwords must have at least one special character')
+  MinLengthValidator(6,
+      errorText: 'Password must be at least 6 characters long'),
 ]);
 
 final emailValidator = MultiValidator([

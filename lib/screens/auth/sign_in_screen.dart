@@ -6,6 +6,7 @@ import '../../services/api_service.dart';
 import 'sign_up_screen.dart';
 import 'forgot_password_screen.dart';
 import '../../entry_point.dart';
+import '../admin/admin_dashboard_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -33,16 +34,25 @@ class _SignInScreenState extends State<SignInScreen> {
       setState(() => _isLoading = true);
 
       try {
-        await ApiService.login(
+        final authResponse = await ApiService.login(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
 
         if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const EntryPoint()),
-          );
+          // Check if user is admin and redirect accordingly
+          if (authResponse.user.role == 'admin') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const AdminDashboardScreen()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const EntryPoint()),
+            );
+          }
         }
       } catch (e) {
         if (mounted) {

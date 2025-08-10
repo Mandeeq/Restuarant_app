@@ -30,25 +30,49 @@ class MenuItem {
   });
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
-    // Construct full image URL from backend using utility
-    String imageUrl = ImageUtils.getImageUrl(json['imageUrl']);
+    try {
+      // Construct full image URL from backend using utility
+      String imageUrl = ImageUtils.getImageUrl(json['imageUrl']);
 
-    return MenuItem(
-      id: json['_id'],
-      name: json['name'],
-      description: json['description'] ?? '',
-      price: (json['price'] is int)
-          ? (json['price'] as int).toDouble()
-          : json['price'].toDouble(),
-      category: json['category'],
-      dietaryTags: List<String>.from(json['dietaryTags'] ?? []),
-      imageUrl: imageUrl,
-      isFeatured: json['isFeatured'] ?? false,
-      preparationTime: json['preparationTime'] ?? 15,
-      available: json['available'] ?? true,
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
-    );
+      return MenuItem(
+        id: json['_id'] ?? '',
+        name: json['name'] ?? 'Unknown Item',
+        description: json['description'] ?? '',
+        price: (json['price'] is int)
+            ? (json['price'] as int).toDouble()
+            : (json['price'] ?? 0.0).toDouble(),
+        category: json['category'] ?? 'Other',
+        dietaryTags: List<String>.from(json['dietaryTags'] ?? []),
+        imageUrl: imageUrl,
+        isFeatured: json['isFeatured'] ?? false,
+        preparationTime: json['preparationTime'] ?? 15,
+        available: json['available'] ?? true,
+        createdAt: json['createdAt'] != null 
+            ? DateTime.parse(json['createdAt']) 
+            : DateTime.now(),
+        updatedAt: json['updatedAt'] != null 
+            ? DateTime.parse(json['updatedAt']) 
+            : DateTime.now(),
+      );
+    } catch (e) {
+      print('❌ Error parsing MenuItem: $e');
+      print('❌ JSON data: $json');
+      // Return a default menu item instead of throwing
+      return MenuItem(
+        id: json['_id'] ?? 'error',
+        name: json['name'] ?? 'Error Loading Item',
+        description: 'This item could not be loaded properly',
+        price: 0.0,
+        category: 'Error',
+        dietaryTags: [],
+        imageUrl: ImageUtils.getDefaultImageUrl(),
+        isFeatured: false,
+        preparationTime: 15,
+        available: false,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 // Admin User Model
 class AdminUser {
   final String id;

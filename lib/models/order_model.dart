@@ -1,3 +1,5 @@
+import 'user_model.dart';
+
 class OrderItem {
   final String menuItemId;
   final String name;
@@ -15,12 +17,14 @@ class OrderItem {
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
-      menuItemId: json['menuItemId'],
-      name: json['name'],
+      menuItemId: json['menuItemId'] ?? '',
+      name: json['name'] ?? '',
       price: (json['price'] is int)
           ? (json['price'] as int).toDouble()
-          : json['price'].toDouble(),
-      quantity: json['quantity'],
+          : (json['price'] ?? 0.0).toDouble(),
+      quantity: (json['quantity'] is int)
+          ? json['quantity'] as int
+          : int.tryParse(json['quantity'].toString()) ?? 1,
       specialInstructions: json['specialInstructions'],
     );
   }
@@ -75,6 +79,7 @@ class DeliveryAddress {
 class Order {
   final String? id;
   final String? userId;
+  final User? user; // Added user field
   final List<OrderItem> items;
   final double totalAmount;
   final double deliveryFee;
@@ -94,6 +99,7 @@ class Order {
   Order({
     this.id,
     this.userId,
+    this.user,
     required this.items,
     required this.totalAmount,
     this.deliveryFee = 0,
@@ -111,44 +117,63 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
-    // Debug print to help trace issues
-    print('Order JSON: ' + json.toString());
-    return Order(
-      id: json['_id'],
-      userId: json['user'] is String
-          ? json['user']
-          : (json['user'] != null ? json['user']['_id'] : null),
-      items: (json['items'] as List<dynamic>)
-          .map((item) => OrderItem.fromJson(item))
-          .toList(),
-      totalAmount: (json['totalAmount'] is int)
-          ? (json['totalAmount'] as int).toDouble()
-          : json['totalAmount'].toDouble(),
-      deliveryFee: (json['deliveryFee'] is int)
-          ? (json['deliveryFee'] as int).toDouble()
-          : (json['deliveryFee'] ?? 0).toDouble(),
-      serviceType: json['serviceType'],
-      deliveryAddress: json['deliveryAddress'] != null
-          ? DeliveryAddress.fromJson(json['deliveryAddress'])
-          : null,
-      paymentMethod: json['paymentMethod'],
-      paymentStatus: json['paymentStatus'] ?? 'pending',
-      orderStatus: json['orderStatus'] ?? 'pending',
-      promoCode: json['promoCode'],
-      discountApplied: (json['discountApplied'] ?? 0).toDouble(),
-      createdAt:
-          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedAt:
-          json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
-      rating: json['rating']?.toDouble(),
-      review: json['review'],
-    );
+    try {
+      // Debug print to help trace issues
+      print('Order JSON: $json');
+      return Order(
+        id: json['_id'],
+        userId: json['user'] is String
+            ? json['user']
+            : (json['user'] != null ? json['user']['_id'] : null),
+        user: json['user'] is Map<String, dynamic>
+            ? User.fromJson(json['user'])
+            : null,
+        items: (json['items'] as List<dynamic>?)
+                ?.map((item) => OrderItem.fromJson(item))
+                .toList() ??
+            [],
+        totalAmount: (json['totalAmount'] is int)
+            ? (json['totalAmount'] as int).toDouble()
+            : (json['totalAmount'] ?? 0.0).toDouble(),
+        deliveryFee: (json['deliveryFee'] is int)
+            ? (json['deliveryFee'] as int).toDouble()
+            : (json['deliveryFee'] ?? 0).toDouble(),
+        serviceType: json['serviceType'] ?? 'takeaway',
+        deliveryAddress: json['deliveryAddress'] != null
+            ? DeliveryAddress.fromJson(json['deliveryAddress'])
+            : null,
+        paymentMethod: json['paymentMethod'] ?? 'cash',
+        paymentStatus: json['paymentStatus'] ?? 'pending',
+        orderStatus: json['orderStatus'] ?? 'pending',
+        promoCode: json['promoCode'],
+        discountApplied: (json['discountApplied'] ?? 0).toDouble(),
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse(json['createdAt'])
+            : null,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse(json['updatedAt'])
+            : null,
+        rating: json['rating']?.toDouble(),
+        review: json['review'],
+      );
+    } catch (e) {
+      print('❌ Error parsing Order: $e');
+      print('❌ JSON data: $json');
+      // Return a default order to prevent crashes
+      return Order(
+        items: [],
+        totalAmount: 0.0,
+        serviceType: 'takeaway',
+        paymentMethod: 'cash',
+      );
+    }
   }
 
   Map<String, dynamic> toJson() {
     return {
       if (id != null) '_id': id,
       if (userId != null) 'user': userId,
+      if (user != null) 'user': user!.toJson(),
       'items': items.map((item) => item.toJson()).toList(),
       'totalAmount': totalAmount,
       'deliveryFee': deliveryFee,

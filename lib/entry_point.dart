@@ -60,8 +60,17 @@ class _EntryPointState extends State<EntryPoint> {
               child: Container(
                 width: 44,
                 height: 44,
-               
-               
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.9),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      offset: const Offset(0, 4),
+                      blurRadius: 8,
+                      color: Colors.black.withOpacity(0.25),
+                    ),
+                  ],
+                ),
                 child: Stack(
                   alignment: Alignment.center,
                   children: [

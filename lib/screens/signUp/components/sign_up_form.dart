@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../phoneLogin/phone_login_screen.dart';
+import '../../../entry_point.dart';
 import '../../../services/api_service.dart';
 import '../../../constants.dart';
 
@@ -12,16 +12,27 @@ class SignUpForm extends StatefulWidget {
 
 class _SignUpFormState extends State<SignUpForm> {
   final _formKey = GlobalKey<FormState>();
-  String? _name, _email, _password, _confirmPassword, _phone;
-  bool _obscureText = true;
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  String? _name, _email, _phone;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   bool _isLoading = false;
+
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
 
     _formKey.currentState!.save();
 
-    if (_password != _confirmPassword) {
+    // Double-check password match before proceeding
+    if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Passwords do not match'),
@@ -37,7 +48,7 @@ class _SignUpFormState extends State<SignUpForm> {
       final response = await ApiService.register(
         name: _name!,
         email: _email!,
-        password: _password!,
+        password: _passwordController.text,
         phone: _phone,
       );
 
@@ -49,11 +60,11 @@ class _SignUpFormState extends State<SignUpForm> {
           ),
         );
 
-        // Navigate to login screen after successful registration
+        // Navigate directly to main app after successful registration
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => const PghoneLoginScreen(),
+            builder: (_) => const EntryPoint(),
           ),
         );
       }
@@ -110,19 +121,19 @@ class _SignUpFormState extends State<SignUpForm> {
 
           // Password Field
           TextFormField(
-            obscureText: _obscureText,
+            controller: _passwordController,
+            obscureText: _obscurePassword,
             validator: passwordValidator.call,
             textInputAction: TextInputAction.next,
-            onSaved: (value) => _password = value,
             decoration: InputDecoration(
               hintText: "Password",
               suffixIcon: GestureDetector(
                 onTap: () {
                   setState(() {
-                    _obscureText = !_obscureText;
+                    _obscurePassword = !_obscurePassword;
                   });
                 },
-                child: _obscureText
+                child: _obscurePassword
                     ? const Icon(Icons.visibility_off, color: bodyTextColor)
                     : const Icon(Icons.visibility, color: bodyTextColor),
               ),
@@ -132,26 +143,26 @@ class _SignUpFormState extends State<SignUpForm> {
 
           // Confirm Password Field
           TextFormField(
-            obscureText: _obscureText,
+            controller: _confirmPasswordController,
+            obscureText: _obscureConfirmPassword,
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please confirm your password';
               }
-              if (value != _password) {
+              if (value != _passwordController.text) {
                 return 'Passwords do not match';
               }
               return null;
             },
-            onSaved: (value) => _confirmPassword = value,
             decoration: InputDecoration(
               hintText: "Confirm Password",
               suffixIcon: GestureDetector(
                 onTap: () {
                   setState(() {
-                    _obscureText = !_obscureText;
+                    _obscureConfirmPassword = !_obscureConfirmPassword;
                   });
                 },
-                child: _obscureText
+                child: _obscureConfirmPassword
                     ? const Icon(Icons.visibility_off, color: bodyTextColor)
                     : const Icon(Icons.visibility, color: bodyTextColor),
               ),

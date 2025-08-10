@@ -4,7 +4,6 @@ import '../../models/menu_item_model.dart';
 import '../../services/api_service.dart';
 import '../../components/cards/iteam_card.dart';
 import '../payment/cart_page.dart';
-import '../../utils/image_utils.dart';
 
 class MenuScreen extends StatefulWidget {
   final List<String> cartItems; // ✅ Receive cart items from EntryPoint
