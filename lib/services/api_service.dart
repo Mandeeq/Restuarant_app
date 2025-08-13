@@ -6,10 +6,11 @@ import '../models/user_model.dart';
 import '../models/payment_model.dart';
 import '../models/admin_models.dart';
 import '../models/cart_model.dart';
+import '../models/auth_response.dart';
 
 class ApiService {
   // Use your computer IP address (same one used in MongoDB Compass/Postman)
-  static const String baseUrl = "http://192.2.1.118:5000/api";
+  static const String baseUrl = "http://192.168.66.242:5000/api";
 
   // Connection timeout settings
   static const Duration connectionTimeout = Duration(seconds: 10);
