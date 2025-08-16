@@ -16,8 +16,8 @@ class OnboardContent extends StatelessWidget {
     return Column(
       children: [
         Expanded(
-          child: Container(
-            height: 300, // Fixed height instead of aspect ratio
+          child: AspectRatio(
+            aspectRatio: 1,
             child: SvgPicture.asset(illustration!),
           ),
         ),

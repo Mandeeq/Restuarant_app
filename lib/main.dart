@@ -20,7 +20,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AppStateService()),
       ],
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
         title: 'The Flutter Way - Foodly UI Kit',
         theme: ThemeData(
           useMaterial3: false,
@@ -44,30 +43,7 @@ class MyApp extends StatelessWidget {
             hintStyle: TextStyle(color: Color(0xFF603D35)),
           ),
         ),
-        initialRoute: '/',
-        onGenerateRoute: (settings) {
-          // Block all auth-related routes if user is authenticated
-          if (settings.name == '/onboarding' || settings.name == '/login' || settings.name == '/register') {
-            return MaterialPageRoute(
-              builder: (context) => const AppInitializer(),
-            );
-          }
-          
-          // Handle root route
-          if (settings.name == '/') {
-            return MaterialPageRoute(
-              builder: (context) => const AppInitializer(),
-            );
-          }
-          
-          // Block any other routes that might be accessed directly
-          return MaterialPageRoute(
-            builder: (context) => const AppInitializer(),
-          );
-        },
-        navigatorObservers: [
-          RouteObserver<Route<dynamic>>(),
-        ],
+        home: const AppInitializer(),
       ),
     );
   }
@@ -79,8 +55,6 @@ class AppInitializer extends StatefulWidget {
   @override
   State<AppInitializer> createState() => _AppInitializerState();
 }
-
-
 
 class _AppInitializerState extends State<AppInitializer> {
   bool _isInitialized = false;
@@ -97,7 +71,7 @@ class _AppInitializerState extends State<AppInitializer> {
     try {
       await appState.initialize();
     } catch (e) {
-              debugPrint('❌ App initialization failed: $e');
+      print('❌ App initialization failed: $e');
     } finally {
       setState(() {
         _isInitialized = true;
@@ -128,16 +102,10 @@ class _AppInitializerState extends State<AppInitializer> {
         if (appState.isAuthenticated) {
           // Redirect to admin dashboard if user is admin
           if (appState.isAdmin) {
-            return const PopScope(
-              canPop: false, // Prevent back navigation
-              child: AdminDashboardScreen(),
-            );
+            return const AdminDashboardScreen();
           } else {
             // Redirect to main app for regular users
-            return const PopScope(
-              canPop: false, // Prevent back navigation
-              child: EntryPoint(),
-            );
+            return const EntryPoint();
           }
         }
 
