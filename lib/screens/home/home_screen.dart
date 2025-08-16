@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants.dart';
+import '../../services/app_state_service.dart';
 import '../orderDetails/order_details_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -98,7 +100,14 @@ class HomeScreen extends StatelessWidget {
               actions: [
                 IconButton(
                   icon: const Icon(Icons.search, color: Colors.white),
-                  onPressed: () {},
+                  onPressed: () {
+                    // TODO: Implement search functionality
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.logout, color: Colors.white),
+                  onPressed: () => _showLogoutDialog(context),
+                  tooltip: 'Logout',
                 ),
               ],
             ),
@@ -406,6 +415,49 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  // Show logout confirmation dialog
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _performLogout(context);
+              },
+              child: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Perform logout and navigate to auth screens
+  void _performLogout(BuildContext context) {
+    final appState = Provider.of<AppStateService>(context, listen: false);
+    
+    // Clear all app state
+    appState.logout();
+    
+    // Navigate to root and clear all previous routes
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      '/',
+      (route) => false, // This removes all previous routes
     );
   }
 }

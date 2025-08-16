@@ -15,8 +15,8 @@ class MediumCardScalton extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          AspectRatio(
-            aspectRatio: 1.25,
+          Container(
+            height: 160, // Fixed height instead of aspect ratio
             child: ScaltonRoundedContainer(),
           ),
           SizedBox(height: 16),

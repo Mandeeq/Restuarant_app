@@ -43,9 +43,9 @@ class _PromotionBannerState extends State<PromotionBanner> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
       child: isLoading
-          ? const AspectRatio(
-              aspectRatio: 1.97,
-              child: ScaltonRoundedContainer(radious: 12),
+          ? Container(
+              height: 120, // Fixed height instead of aspect ratio
+              child: const ScaltonRoundedContainer(radious: 12),
             )
           : Container(
               height: 120,

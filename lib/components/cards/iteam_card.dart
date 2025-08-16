@@ -61,8 +61,10 @@ class ItemCard extends StatelessWidget {
           height: 110,
           child: Row(
             children: [
-              AspectRatio(
-                aspectRatio: 1,
+              // Fixed size image container to prevent overflow
+              Container(
+                width: 110,
+                height: 110,
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
                   child: buildImage(image),
@@ -77,36 +79,57 @@ class ItemCard extends StatelessWidget {
                     Text(
                       title!,
                       maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: Theme.of(context)
                           .textTheme
                           .titleLarge!
-                          .copyWith(fontSize: 18),
+                          .copyWith(fontSize: 16), // Reduced font size
                     ),
-                    Text(
-                      description!,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 4),
+                    Expanded(
+                      child: Text(
+                        description!,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 12, // Smaller font to fit better
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
+                    const SizedBox(height: 4),
                     Row(
                       children: [
-                        Text(
-                          priceRange!,
-                          style: textStyle,
+                        Flexible(
+                          child: Text(
+                            priceRange!,
+                            style: textStyle.copyWith(fontSize: 11),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         const Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: defaultPadding / 2),
                           child: SmallDot(),
                         ),
-                        Text(foodType!, style: textStyle),
+                        Flexible(
+                          child: Text(
+                            foodType!,
+                            style: textStyle.copyWith(fontSize: 11),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                         const Spacer(),
                         Text(
                           "USD$price",
                           style: Theme.of(context)
                               .textTheme
                               .labelLarge!
-                              .copyWith(color: primaryColor),
+                              .copyWith(
+                                color: primaryColor,
+                                fontSize: 12, // Smaller font size
+                              ),
                         )
                       ],
                     ),

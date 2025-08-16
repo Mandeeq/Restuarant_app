@@ -13,8 +13,8 @@ class BigCardScalton extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const AspectRatio(
-          aspectRatio: 1.81,
+        Container(
+          height: 250, // Fixed height instead of aspect ratio
           child: BigCardImageSlideScalton(),
         ),
         const SizedBox(height: 16),

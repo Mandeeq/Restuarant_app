@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants.dart';
 import '../../services/api_service.dart';
+import '../../services/app_state_service.dart';
 import '../../screens/phoneLogin/number_verify_screen.dart';
 import 'components/profile_info_screen.dart';
 import 'components/change_password_screen.dart';
@@ -321,10 +323,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     "Logout",
                     Icons.logout,
                     Colors.red,
-                    () {
-                      ApiService.clearAuthData();
-                      Navigator.pushReplacementNamed(context, '/login');
-                    },
+                    () => _showLogoutDialog(context),
                   ),
                 ],
               ),
@@ -476,6 +475,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  // Show logout confirmation dialog
+  void _showLogoutDialog(BuildContext context) {
+    final user = ApiService.currentUser;
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirm Logout'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Are you sure you want to logout?'),
+              if (user != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  'Current user: ${user.name} (${user.role})',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _performLogout(context);
+              },
+              child: const Text(
+                'Logout',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Perform logout and navigate to auth screens
+  void _performLogout(BuildContext context) {
+    final appState = Provider.of<AppStateService>(context, listen: false);
+    
+    // Clear all app state
+    appState.logout();
+    
+    // Navigate to root and clear all previous routes
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      '/',
+      (route) => false, // This removes all previous routes
     );
   }
 }

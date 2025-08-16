@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import 'constants.dart';
+import 'components/auth_guard.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/menu/menu_screen.dart';
 import 'screens/orderDetails/order_details_screen.dart';
@@ -17,6 +18,22 @@ class EntryPoint extends StatefulWidget {
 }
 
 class _EntryPointState extends State<EntryPoint> {
+  @override
+  Widget build(BuildContext context) {
+    return const AuthGuard(
+      child: _EntryPointContent(),
+    );
+  }
+}
+
+class _EntryPointContent extends StatefulWidget {
+  const _EntryPointContent({super.key});
+
+  @override
+  State<_EntryPointContent> createState() => __EntryPointContentState();
+}
+
+class __EntryPointContentState extends State<_EntryPointContent> {
   int _selectedIndex = 0;
   final List<String> _cartItems = [];
 
@@ -39,8 +56,10 @@ class _EntryPointState extends State<EntryPoint> {
       const ProfileScreen(),
     ];
 
-    return Scaffold(
-      body: Stack(
+    return PopScope(
+      canPop: false, // Prevent back navigation to auth screens
+      child: Scaffold(
+        body: Stack(
         children: [
           screens[_selectedIndex],
 
@@ -142,6 +161,7 @@ class _EntryPointState extends State<EntryPoint> {
             label: _navitems[index]["title"],
           ),
         ),
+      ),
       ),
     );
   }
