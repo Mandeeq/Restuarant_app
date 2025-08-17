@@ -32,8 +32,9 @@ class FeaturedItemCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AspectRatio(
-                aspectRatio: 1,
+              // Fixed height container to prevent overflow
+              Container(
+                height: 140, // Fixed height instead of aspect ratio
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
                   child: Image.asset(

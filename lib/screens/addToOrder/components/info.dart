@@ -13,8 +13,9 @@ class Info extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AspectRatio(
-          aspectRatio: 1.33,
+        // Fixed height container to prevent overflow
+        Container(
+          height: 200, // Fixed height instead of aspect ratio
           child: Image.asset(
             "assets/images/Header-image.png",
             fit: BoxFit.cover,

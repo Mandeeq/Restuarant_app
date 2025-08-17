@@ -21,8 +21,8 @@ class _BigCardImageSlideState extends State<BigCardImageSlide> {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.81,
+    return Container(
+      height: 250, // Fixed height instead of aspect ratio
       child: Stack(
         children: [
           PageView.builder(

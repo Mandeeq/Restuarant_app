@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AppStateService()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'The Flutter Way - Foodly UI Kit',
         theme: ThemeData(
           useMaterial3: false,
