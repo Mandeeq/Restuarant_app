@@ -23,7 +23,7 @@ class ImageTestWidget extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Image.network(
-            'http://192.2.1.118:5000/images/food.jpg',
+            'http://192.168.1.104:5000/images/food.jpg',
             height: 200,
             width: double.infinity,
             fit: BoxFit.cover,
@@ -59,7 +59,7 @@ class ImageTestWidget extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Image.network(
-            'http://192.2.1.118:5000/images/drink.jpg',
+            'http://192.168.1.104:5000/images/drink.jpg',
             height: 200,
             width: double.infinity,
             fit: BoxFit.cover,
@@ -95,7 +95,7 @@ class ImageTestWidget extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Image.network(
-            'http://192.2.1.118:5000/images/nonexistent.jpg',
+            'http://192.168.1.104:5000/images/nonexistent.jpg',
             height: 200,
             width: double.infinity,
             fit: BoxFit.cover,

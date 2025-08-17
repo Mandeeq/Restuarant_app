@@ -107,7 +107,7 @@ class _MenuScreenState extends State<MenuScreen> {
               color: Theme.of(context).canvasColor, // Or your specific background color for this bar
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey.shade300, // Choose a subtle color for the border
+                  color: Colors.grey.shade400, // Choose a subtle color for the border
                   width: 1.0, // Adjust width as needed, 1.0 is usually good for a subtle line
                 ),
               ),
@@ -232,14 +232,34 @@ class _MenuScreenState extends State<MenuScreen> {
                       height: 100, // Reduced height to give more space for content
                       child: ClipRRect(
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(16),
+                          top: Radius.circular(14),
                         ),
                         child: Image.network(
                           item.imageUrl,
                           fit: BoxFit.cover,
                           width: double.infinity,
-                          errorBuilder: (context, error, stackTrace) =>
-                          const Icon(Icons.broken_image, size: 50),
+                          errorBuilder: (context, error, stackTrace) {
+                            print('❌ Image loading error for ${item.name}: $error');
+                            print('❌ Image URL: ${item.imageUrl}');
+                            return Container(
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              color: Colors.grey[200],
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -285,43 +305,48 @@ class _MenuScreenState extends State<MenuScreen> {
                                 fontSize: 13, // Slightly smaller price
                               ),
                             ),
-                            const SizedBox(height: 6), // Reduced spacing
+                            // const SizedBox(height: 2), // Reduced spacing
                             // Order Button
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(vertical: 4), // Reduced padding
-                                  minimumSize: const Size(0, 28), // Fixed height button
-                                ),
-                                onPressed: () {
-                                  widget.onAddToCart(item.name);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Added ${item.name} to cart'),
-                                      action: SnackBarAction(
-                                        label: 'View Cart',
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CartPage(cartItems: widget.cartItems),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: const Text("Order", style: TextStyle(fontSize: 11)),
+                        SizedBox(
+                          width: double.infinity,
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary, // ✅ fill with primary
+                              foregroundColor: Colors.white, // ✅ text color
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
                               ),
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              minimumSize: const Size(0, 28),
                             ),
-                          ],
+                            onPressed: () {
+                              widget.onAddToCart(item.name);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Added ${item.name} to cart'),
+                                  action: SnackBarAction(
+                                    label: 'View Cart',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              CartPage(cartItems: widget.cartItems),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Order",
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+
+                        ],
                         ),
                       ),
                     ),

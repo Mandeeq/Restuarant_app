@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Warm food-related color palette
-const Color primaryColor = Color(0xFFE53935); // 🍅 Vibrant Red
+const Color primaryColor = Color(0xFFFD140E); // 🍅 Vibrant Red
 const Color secondaryColor = Color(0xFFFFC107); // 🌽 Golden Yellow
 const Color backgroundColor = Color(0xFFFAE4E4); // Warm off-white background
 const Color cardColor = Colors.white;

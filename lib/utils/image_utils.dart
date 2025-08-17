@@ -1,20 +1,25 @@
 class ImageUtils {
-  static const String baseUrl = 'http://192.2.1.118:5000';
+  static const String baseUrl = 'http://192.168.1.104:5000';
   static const String imagesPath = '/images';
 
   /// Constructs a full image URL from a relative path
   static String getImageUrl(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty) {
-      return '$baseUrl$imagesPath/food.jpg'; // Default fallback image
+      final defaultUrl = '$baseUrl$imagesPath/food.jpg';
+      print('🖼️ Using default image URL: $defaultUrl');
+      return defaultUrl; // Default fallback image
     }
 
     // If it's already a full URL, return as is
     if (imagePath.startsWith('http')) {
+      print('🖼️ Using full URL as is: $imagePath');
       return imagePath;
     }
 
     // Construct full URL from relative path
-    return '$baseUrl$imagesPath/$imagePath';
+    final fullUrl = '$baseUrl$imagesPath/$imagePath';
+    print('🖼️ Constructed image URL: $fullUrl from path: $imagePath');
+    return fullUrl;
   }
 
   /// Gets the default fallback image URL

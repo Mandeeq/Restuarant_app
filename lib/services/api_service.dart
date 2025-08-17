@@ -10,7 +10,7 @@ import '../models/auth_response.dart';
 
 class ApiService {
   // Use your computer IP address (same one used in MongoDB Compass/Postman)
-  static const String baseUrl = "http://192.10.1.106:5000/api";
+  static const String baseUrl = "http://192.168.1.104:5000/api";
 
   // Connection timeout settings
   static const Duration connectionTimeout = Duration(seconds: 10);
@@ -233,9 +233,12 @@ class ApiService {
         final menuItems = items
             .map((json) {
               try {
-                return MenuItem.fromJson(json);
+                final item = MenuItem.fromJson(json);
+                print('✅ Parsed menu item: ${item.name} with image: ${item.imageUrl}');
+                return item;
               } catch (e) {
                 print('❌ Error parsing menu item: $e');
+                print('❌ JSON data: $json');
                 return null;
               }
             })

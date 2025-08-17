@@ -38,6 +38,8 @@ class MenuItemScreen extends StatelessWidget {
                       menuItem.imageUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
+                        print('❌ Image loading error for ${menuItem.name}: $error');
+                        print('❌ Image URL: ${menuItem.imageUrl}');
                         return Container(
                           color: Colors.grey[300],
                           child: const Center(
