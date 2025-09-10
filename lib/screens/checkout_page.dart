@@ -12,6 +12,7 @@ class CheckoutPage extends StatefulWidget {
 class _CheckoutPageState extends State<CheckoutPage> {
   String _selectedPayment = 'Cash';
   final TextEditingController _allergyController = TextEditingController();
+  final TextEditingController _mpesaController = TextEditingController();
   bool _needCutlery = false;
 
   String _selectedDelivery = 'Standard';
@@ -122,7 +123,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       child: Column(
                         children: [
                           RadioListTile<String>(
-                            title: const Text("Standard Delivery (Free, may delay)"),
+                            title: const Text(
+                                "Standard Delivery (Free, may delay)"),
                             secondary: const Icon(Icons.access_time,
                                 color: Colors.black),
                             value: "Standard",
@@ -136,7 +138,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                           const Divider(height: 0),
                           RadioListTile<String>(
-                            title: const Text("Economy Delivery (KSh 200, faster)"),
+                            title: const Text(
+                                "Economy Delivery (KSh 200, faster)"),
                             secondary: const Icon(Icons.bolt, color: Colors.black),
                             value: "Economy",
                             groupValue: _selectedDelivery,
@@ -165,8 +168,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 const Icon(Icons.attach_money, color: Colors.black),
                             value: 'Cash',
                             groupValue: _selectedPayment,
-                            onChanged: (value) =>
-                                setState(() => _selectedPayment = value!),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedPayment = value!;
+                              });
+                            },
                           ),
                           const Divider(height: 0),
                           RadioListTile<String>(
@@ -175,16 +181,36 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 const Icon(Icons.phone_android, color: Colors.black),
                             value: 'M-Pesa',
                             groupValue: _selectedPayment,
-                            onChanged: (value) =>
-                                setState(() => _selectedPayment = value!),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedPayment = value!;
+                              });
+                            },
                           ),
+                          // Show phone number input only if M-Pesa is selected
+                          if (_selectedPayment == 'M-Pesa')
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: TextField(
+                                controller: _mpesaController,
+                                keyboardType: TextInputType.phone,
+                                decoration: InputDecoration(
+                                  hintText: 'Enter M-Pesa number',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  prefixIcon:
+                                      const Icon(Icons.phone_android, color: Colors.black),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
 
                     const SizedBox(height: 20),
 
-                    // Order Summary (Moved to END)
+                    // Order Summary
                     _buildCard(
                       title: "Order Summary",
                       icon: Icons.receipt_long,
@@ -266,6 +292,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     String cutleryNote =
                         _needCutlery ? "Yes, include cutlery" : "No cutlery";
 
+                    String paymentInfo = _selectedPayment == 'M-Pesa'
+                        ? 'M-Pesa Number: ${_mpesaController.text}'
+                        : 'Cash';
+
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
@@ -280,7 +310,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ],
                         ),
                         content: Text(
-                          'Payment Method: $_selectedPayment\n'
+                          'Payment Method: $paymentInfo\n'
                           'Delivery Option: $_selectedDelivery\n'
                           'Products Ordered: $totalItems\n'
                           'Total: KSh $totalAmount\n'

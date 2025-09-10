@@ -6,7 +6,7 @@ import '../models/user_model.dart';
 
 class ApiService {
   // Use your computer IP address (same one used in MongoDB Compass/Postman)
-  static const String baseUrl = "http://10.66.215.93:5000";  // ✅ Use your actual IP + port
+  static const String baseUrl = "http://192.168.100.8:5000";  // ✅ Use your actual IP + port
 
 
   // Store authentication token
