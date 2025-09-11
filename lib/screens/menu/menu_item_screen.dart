@@ -1,7 +1,7 @@
 // lib/screens/menu/menu_item_screen.dart
 import 'package:flutter/material.dart';
 import '../../models/menu_item_model.dart';
-import '../../constants.dart';
+import '../../theme.dart';
 import '../../services/api_service.dart';
 
 class MenuItemScreen extends StatelessWidget {

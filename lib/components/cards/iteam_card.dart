@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants.dart';
+import '../../theme.dart';
 import '../../utils/image_utils.dart';
 import '../small_dot.dart';
 

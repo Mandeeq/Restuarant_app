@@ -4,7 +4,7 @@ import '../../entry_point.dart';
 
 import '../../components/buttons/secondery_button.dart';
 import '../../components/welcome_text.dart';
-import '../../constants.dart';
+import '../../theme.dart';
 
 class FindRestaurantsScreen extends StatelessWidget {
   const FindRestaurantsScreen({super.key});

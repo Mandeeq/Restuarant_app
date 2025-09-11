@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../components/buttons/primary_button.dart';
 import '../../components/welcome_text.dart';
-import '../../constants.dart';
+import '../../theme.dart';
 import 'number_verify_screen.dart';
 
 class PghoneLoginScreen extends StatefulWidget {

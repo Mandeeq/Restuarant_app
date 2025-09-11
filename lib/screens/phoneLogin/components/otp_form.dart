@@ -4,7 +4,7 @@ import '../../../services/api_service.dart';
 
 import 'package:form_field_validator/form_field_validator.dart';
 
-import '../../../constants.dart';
+import '../../../theme.dart';
 
 class OtpForm extends StatefulWidget {
   final String phoneNumber;

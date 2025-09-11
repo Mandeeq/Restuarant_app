@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../components/cards/medium/restaurant_info_medium_card.dart';
 import '../../../components/scalton/medium_card_scalton.dart';
-import '../../../constants.dart';
+import '../../../theme.dart';
 import '../../../demo_data.dart';
 import '../../details/details_screen.dart';
 

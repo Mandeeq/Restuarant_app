@@ -88,7 +88,7 @@ class DailyRevenue {
 
   factory DailyRevenue.fromJson(Map<String, dynamic> json) {
     return DailyRevenue(
-      date: json['date'],
+      date: json['date'] ?? '',
       revenue: (json['revenue'] ?? 0).toDouble(),
       orders: json['orders'] ?? 0,
     );
@@ -111,7 +111,7 @@ class CategoryStats {
 
   factory CategoryStats.fromJson(Map<String, dynamic> json) {
     return CategoryStats(
-      category: json['category'],
+      category: json['category'] ?? 'Unknown',
       orders: json['orders'] ?? 0,
       revenue: (json['revenue'] ?? 0).toDouble(),
       percentage: (json['percentage'] ?? 0).toDouble(),

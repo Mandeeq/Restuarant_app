@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants.dart';
+import '../../theme.dart';
 import '../../services/api_service.dart';
 import '../../screens/phoneLogin/number_verify_screen.dart';
 import 'components/profile_info_screen.dart';

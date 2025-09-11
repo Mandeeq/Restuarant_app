@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../../constants.dart';
+import '../../theme.dart';
 import '../search/search_screen.dart';
 import 'components/featured_items.dart';
 import 'components/iteams.dart';

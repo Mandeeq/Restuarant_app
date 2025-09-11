@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-import '../../../constants.dart';
+import '../../../theme.dart';
 import '../../price_range_and_food_type.dart';
 import '../../rating_with_counter.dart';
 import '../../small_dot.dart';

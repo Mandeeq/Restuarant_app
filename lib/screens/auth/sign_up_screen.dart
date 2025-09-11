@@ -5,7 +5,7 @@ import 'sign_in_screen.dart';
 
 import '../../components/buttons/socal_button.dart';
 import '../../components/welcome_text.dart';
-import '../../constants.dart';
+import '../../theme.dart';
 import '../signUp/components/sign_up_form.dart';
 
 class SignUpScreen extends StatelessWidget {

@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../components/cards/big/restaurant_info_big_card.dart';
 import '../../components/scalton/big_card_scalton.dart';
-import '../../constants.dart';
+import '../../theme.dart';
 import '../../demo_data.dart';
 
 class SearchScreen extends StatefulWidget {

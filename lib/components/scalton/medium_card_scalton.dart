@@ -10,21 +10,21 @@ class MediumCardScalton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SizedBox(
+    return SizedBox(
       width: 200,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             height: 160, // Fixed height instead of aspect ratio
-            child: ScaltonRoundedContainer(),
+            child: const ScaltonRoundedContainer(),
           ),
-          SizedBox(height: 16),
-          ScaltonLine(width: 150),
-          SizedBox(height: 16),
-          ScaltonLine(),
-          SizedBox(height: 16),
-          ScaltonLine(),
+          const SizedBox(height: 16),
+          const ScaltonLine(width: 150),
+          const SizedBox(height: 16),
+          const ScaltonLine(),
+          const SizedBox(height: 16),
+          const ScaltonLine(),
         ],
       ),
     );

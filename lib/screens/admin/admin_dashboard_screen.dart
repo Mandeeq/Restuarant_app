@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants.dart';
+import '../../theme.dart';
 import '../../models/admin_models.dart';
 import '../../services/api_service.dart';
 import 'admin_orders_screen.dart';
@@ -28,18 +28,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     setState(() => _isLoading = true);
     try {
       final stats = await ApiService.getDashboardStats();
-      setState(() {
-        _stats = stats;
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _stats = stats;
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error loading dashboard: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading dashboard: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: Colors.white,
+              onPressed: _loadDashboardStats,
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -148,42 +158,94 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         crossAxisCount: 2,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 16,
-                        childAspectRatio: 1.2,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: 1.3,
                         children: [
                           _buildStatCard(
                             'Total Orders',
-                            _stats!.totalOrders.toString(),
+                            (_stats?.totalOrders ?? 0).toString(),
                             Icons.shopping_cart,
                             primaryColor,
                             'All time orders',
                           ),
                           _buildStatCard(
                             'Pending Orders',
-                            _stats!.pendingOrders.toString(),
+                            (_stats?.pendingOrders ?? 0).toString(),
                             Icons.pending,
                             Colors.orange,
                             'Awaiting processing',
                           ),
                           _buildStatCard(
                             'Total Revenue',
-                            '\$${_stats!.totalRevenue.toStringAsFixed(2)}',
+                            '\$${(_stats?.totalRevenue ?? 0.0).toStringAsFixed(2)}',
                             Icons.monetization_on,
                             Colors.green,
                             'Total earnings',
                           ),
                           _buildStatCard(
                             'Customers',
-                            _stats!.totalCustomers.toString(),
+                            (_stats?.totalCustomers ?? 0).toString(),
                             Icons.people,
                             Colors.blue,
                             'Registered users',
                           ),
                         ],
+                      )
+                    else
+                      Container(
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              Icons.error_outline,
+                              size: 48,
+                              color: Colors.grey[400],
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Unable to load statistics',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Please check your connection and try again',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[500],
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              onPressed: _loadDashboardStats,
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('Retry'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: primaryColor,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 24),
 
                     // Quick Actions Section
                     const Text(
@@ -194,7 +256,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         color: titleColor,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // Quick Actions Grid
                     GridView.count(
@@ -203,7 +265,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       crossAxisCount: 2,
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
-                      childAspectRatio: 1.5,
+                      childAspectRatio: 1.8,
                       children: [
                         _buildActionCard(
                           'Manage Orders',
@@ -284,21 +346,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             _buildActivityItem(
                               Icons.shopping_cart,
                               'Total Orders Today',
-                              _stats!.totalOrders.toString(),
+                              (_stats?.totalOrders ?? 0).toString(),
                               primaryColor,
                             ),
                             const Divider(),
                             _buildActivityItem(
                               Icons.monetization_on,
                               'Revenue Today',
-                              '\$${_stats!.totalRevenue.toStringAsFixed(2)}',
+                              '\$${(_stats?.totalRevenue ?? 0.0).toStringAsFixed(2)}',
                               Colors.green,
                             ),
                             const Divider(),
                             _buildActivityItem(
                               Icons.people,
                               'New Customers',
-                              _stats!.totalCustomers.toString(),
+                              (_stats?.totalCustomers ?? 0).toString(),
                               Colors.blue,
                             ),
                           ],
@@ -307,16 +369,96 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     ],
                     
                     const SizedBox(height: 32),
+                    const SizedBox(height: 80), // Extra padding for FAB
                   ],
                 ),
               ),
             ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Show a menu with quick actions
+          showModalBottomSheet(
+            context: context,
+            builder: (context) => Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Quick Actions',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ListTile(
+                    leading: const Icon(Icons.shopping_cart),
+                    title: const Text('Manage Orders'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminOrdersScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.restaurant_menu),
+                    title: const Text('Manage Menu'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminMenuScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.people),
+                    title: const Text('View Customers'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminCustomersScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.payment),
+                    title: const Text('Payment History'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AdminPaymentsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
+        child: const Icon(Icons.menu),
+      ),
     );
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color, String subtitle) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -334,18 +476,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(icon, color: color, size: 24),
+                child: Icon(icon, color: color, size: 20),
               ),
               const Spacer(),
               Icon(
                 Icons.trending_up,
                 color: Colors.green,
-                size: 16,
+                size: 14,
               ),
             ],
           ),
@@ -353,16 +495,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           Text(
             value,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.bold,
               color: color,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             title,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
               color: titleColor,
             ),
@@ -370,7 +512,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           Text(
             subtitle,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 11,
               color: Colors.grey[600],
             ),
           ),
@@ -396,40 +538,45 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
                   icon,
                   color: primaryColor,
-                  size: 32,
+                  size: 24,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 6),
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                   color: titleColor,
                 ),
                 textAlign: TextAlign.center,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 2),
               Text(
                 description,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 10,
                   color: Colors.grey[600],
                 ),
                 textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

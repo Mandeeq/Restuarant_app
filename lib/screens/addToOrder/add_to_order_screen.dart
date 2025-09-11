@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../constants.dart';
+import '../../theme.dart';
 import '../orderDetails/order_details_screen.dart';
 import 'components/info.dart';
 import 'components/required_section_title.dart';

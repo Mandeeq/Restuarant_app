@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../entry_point.dart';
 import '../../../services/api_service.dart';
-import '../../../constants.dart';
+import '../../../theme.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});

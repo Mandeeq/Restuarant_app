@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants.dart';
+import '../theme.dart';
 
 class WelcomeText extends StatelessWidget {
   final String title, text;

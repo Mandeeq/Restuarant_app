@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import '../../../constants.dart';
+import '../../../theme.dart';
 import 'profile_info_screen.dart';
 import 'change_password_screen.dart';
 import 'payment_methods_screen.dart';

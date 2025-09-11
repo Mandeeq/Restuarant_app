@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../constants.dart';
+import '../../../theme.dart';
 import 'featured_item_card.dart';
 
 class FeaturedItems extends StatelessWidget {

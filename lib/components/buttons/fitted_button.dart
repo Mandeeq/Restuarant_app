@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../constants.dart';
+import '../../theme.dart';
 
 class FittedButton extends StatelessWidget {
   const FittedButton({

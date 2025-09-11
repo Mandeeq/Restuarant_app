@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'constants.dart';
+import 'theme.dart';
 import 'screens/onboarding/onboarding_scrreen.dart';
 import 'services/app_state_service.dart';
 import 'entry_point.dart';

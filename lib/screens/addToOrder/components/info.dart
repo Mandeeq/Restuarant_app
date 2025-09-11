@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../components/price_range_and_food_type.dart';
-import '../../../constants.dart';
+import '../../../theme.dart';
 
 class Info extends StatelessWidget {
   const Info({

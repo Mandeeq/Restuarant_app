@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../constants.dart';
+import '../../../theme.dart';
 
 class PriceRow extends StatelessWidget {
   const PriceRow({

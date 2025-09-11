@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../constants.dart';
+import '../../theme.dart';
 import 'components/categories.dart';
 import 'components/dietaries.dart';
 import 'components/price_range.dart';

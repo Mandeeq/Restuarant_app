@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../constants.dart';
+import '../../../theme.dart';
 import '../../rating.dart';
 import '../../small_dot.dart';
 

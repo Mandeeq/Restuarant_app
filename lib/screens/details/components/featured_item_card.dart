@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../components/small_dot.dart';
-import '../../../constants.dart';
+import '../../../theme.dart';
 
 class FeaturedItemCard extends StatelessWidget {
   const FeaturedItemCard({

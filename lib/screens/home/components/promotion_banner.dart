@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../components/scalton/scalton_rounded_container.dart';
-import '../../../constants.dart';
+import '../../../theme.dart';
 import '../../../services/api_service.dart';
 
 class PromotionBanner extends StatefulWidget {

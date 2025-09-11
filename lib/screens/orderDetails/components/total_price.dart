@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../constants.dart';
+import '../../../theme.dart';
 
 class TotalPrice extends StatelessWidget {
   const TotalPrice({

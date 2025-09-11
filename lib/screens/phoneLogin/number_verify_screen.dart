@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../../components/welcome_text.dart';
-import '../../constants.dart';
+import '../../theme.dart';
 import '../../entry_point.dart';
 import '../../services/api_service.dart';
 import 'components/otp_form.dart';
