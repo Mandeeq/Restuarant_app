@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants.dart';
 import '../../models/menu_item_model.dart';
 import '../../services/api_service.dart';
 import '../../components/cards/iteam_card.dart';
 import '../../screens/cart_page.dart';
+import '../../screens/statemanagement/cart_provider.dart'; // ✅ Import Provider
 
 class MenuScreen extends StatefulWidget {
-  final List<String> cartItems; // ✅ Receive cart items from EntryPoint
-  final Function(String) onAddToCart; // ✅ Callback to add item to shared cart
-
-  const MenuScreen({
-    super.key,
-    required this.cartItems,
-    required this.onAddToCart,
-  });
+  const MenuScreen({super.key});
 
   @override
   State<MenuScreen> createState() => _MenuScreenState();
@@ -73,10 +68,23 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartProvider>(context); // ✅ Get cart state
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Menu'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CartPage(), // ✅ Uses Provider
+                ),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => _loadMenuItems(category: _selectedCategory),
@@ -118,14 +126,14 @@ class _MenuScreenState extends State<MenuScreen> {
 
           // Menu Items
           Expanded(
-            child: _buildMenuContent(),
+            child: _buildMenuContent(cartProvider), // ✅ Pass provider
           ),
         ],
       ),
     );
   }
 
-  Widget _buildMenuContent() {
+  Widget _buildMenuContent(CartProvider cartProvider) {
     if (_isLoading) {
       return const Center(
         child: Column(
@@ -189,7 +197,8 @@ class _MenuScreenState extends State<MenuScreen> {
             price: item.price,
             priceRange: '\$' * (item.price ~/ 5 + 1),
             press: () {
-              widget.onAddToCart(item.name); // ✅ Add item to shared cart
+              cartProvider.addItem(item.name); // ✅ only pass item name
+ // ✅ Add to Provider
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -200,8 +209,7 @@ class _MenuScreenState extends State<MenuScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              CartPage(cartItems: widget.cartItems),
+                          builder: (context) => const CartPage(), // ✅ Uses Provider
                         ),
                       );
                     },

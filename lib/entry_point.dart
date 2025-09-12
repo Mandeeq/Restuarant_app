@@ -1,13 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:provider/provider.dart';
 
 import 'constants.dart';
 import 'screens/home/home_screen.dart';
-import 'screens/menu/menu_screen.dart';
 import 'screens/orderDetails/order_details_screen.dart';
 import 'screens/profile/profile_screen.dart';
 import 'screens/cart_page.dart';
+import 'screens/statemanagement/cart_provider.dart';
+import 'screens/menu/menu_screen.dart'; // ✅ Import your MenuScreen
 
 class EntryPoint extends StatefulWidget {
   const EntryPoint({super.key});
@@ -18,7 +20,6 @@ class EntryPoint extends StatefulWidget {
 
 class _EntryPointState extends State<EntryPoint> {
   int _selectedIndex = 0;
-  final List<String> _cartItems = [];
 
   final List<Map<String, dynamic>> _navitems = [
     {"icon": "assets/icons/home.svg", "title": "Home"},
@@ -29,12 +30,11 @@ class _EntryPointState extends State<EntryPoint> {
 
   @override
   Widget build(BuildContext context) {
+    final cart = context.watch<CartProvider>();
+
     final List<Widget> screens = [
       const HomeScreen(),
-      MenuScreen(
-        cartItems: _cartItems,
-        onAddToCart: addToCart,
-      ),
+      const MenuScreen(), // ✅ Use your real MenuScreen here
       const OrderDetailsScreen(),
       const ProfileScreen(),
     ];
@@ -44,7 +44,7 @@ class _EntryPointState extends State<EntryPoint> {
         children: [
           screens[_selectedIndex],
 
-          // Floating Cart Icon (top-right corner, same size as search icon)
+          // Floating Cart Icon (top-right corner)
           Positioned(
             top: 40,
             right: 35,
@@ -53,28 +53,26 @@ class _EntryPointState extends State<EntryPoint> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => CartPage(cartItems: _cartItems),
+                    builder: (context) => const CartPage(),
                   ),
                 );
               },
-              child: Container(
+              child: SizedBox(
                 width: 44,
                 height: 44,
-               
-               
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
-                    SvgPicture.asset(
-                      "assets/icons/cart.svg",
-                      height: 24,
-                      width: 24,
-                      colorFilter: const ColorFilter.mode(
-                        Colors.white,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    if (_cartItems.isNotEmpty)
+                    // SvgPicture.asset(
+                    //   "assets/icons/cart.svg",
+                    //   height: 24,
+                    //   width: 24,
+                    //   colorFilter: const ColorFilter.mode(
+                    //     Colors.white,
+                    //     BlendMode.srcIn,
+                    //   ),
+                    // ),
+                    if (cart.items.isNotEmpty)
                       Positioned(
                         right: 4,
                         top: 4,
@@ -90,7 +88,7 @@ class _EntryPointState extends State<EntryPoint> {
                             minHeight: 16,
                           ),
                           child: Text(
-                            _cartItems.length.toString(),
+                            cart.items.length.toString(),
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 10,
@@ -135,12 +133,5 @@ class _EntryPointState extends State<EntryPoint> {
         ),
       ),
     );
-  }
-
-  // Add item to cart
-  void addToCart(String itemName) {
-    setState(() {
-      _cartItems.add(itemName);
-    });
   }
 }

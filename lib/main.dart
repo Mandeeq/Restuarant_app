@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'constants.dart';
 import 'screens/onboarding/onboarding_scrreen.dart';
+import 'screens/statemanagement/cart_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,7 +45,7 @@ class MyApp extends StatelessWidget {
           hintStyle: TextStyle(color: Color(0xFF603D35)),
         ),
       ),
-      home: const OnboardingScreen(),
+      home: const OnboardingScreen(), // ✅ EntryPoint will be inside this later
     );
   }
 }
