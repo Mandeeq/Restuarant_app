@@ -1,3 +1,4 @@
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/order_model.dart';
@@ -31,14 +32,14 @@ class ApiService {
   static void setAuthData(String token, User user) {
     _authToken = token;
     _currentUser = user;
-    print('✅ Authentication data set for user: ${user.name}');
+    
   }
 
   // Clear authentication data
   static void clearAuthData() {
     _authToken = null;
     _currentUser = null;
-    print('🔓 Authentication data cleared');
+    
   }
 
   // Get headers with authentication
@@ -56,20 +57,18 @@ class ApiService {
   // Test connection with better error handling
   static Future<bool> testConnection() async {
     try {
-      print('🔍 Testing connection to backend...');
+      
       final response = await http.get(
         Uri.parse('$baseUrl/health'),
         headers: {'Content-Type': 'application/json'},
       ).timeout(connectionTimeout);
 
       _isConnected = response.statusCode == 200;
-      print(_isConnected
-          ? '✅ Backend connection successful'
-          : '❌ Backend connection failed');
+      
       return _isConnected;
     } catch (e) {
       _isConnected = false;
-      print('❌ Backend connection error: $e');
+      
       return false;
     }
   }
@@ -86,7 +85,7 @@ class ApiService {
         return response;
       } catch (e) {
         attempts++;
-        print('⚠️ Request attempt $attempts failed: $e');
+        
         if (attempts >= maxRetries) {
           throw Exception('Request failed after $maxRetries attempts: $e');
         }
@@ -104,7 +103,7 @@ class ApiService {
     required String password,
     String? phone,
   }) async {
-    print('📝 Registering user: $email');
+    
 
     final response = await _makeRequest(() => http.post(
       Uri.parse('$baseUrl/auth/register'),
@@ -121,12 +120,12 @@ class ApiService {
       final data = jsonDecode(response.body);
       final authResponse = AuthResponse.fromJson(data);
       setAuthData(authResponse.token, authResponse.user);
-      print('✅ Registration successful for: ${authResponse.user.name}');
+      
       return authResponse;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Registration failed';
-      print('❌ Registration failed: $message');
+      
       throw Exception(message);
     }
   }
@@ -135,7 +134,7 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    print('🔐 Logging in user: $email');
+    
 
     final response = await _makeRequest(() => http.post(
       Uri.parse('$baseUrl/auth/login'),
@@ -150,12 +149,12 @@ class ApiService {
       final data = jsonDecode(response.body);
       final authResponse = AuthResponse.fromJson(data);
       setAuthData(authResponse.token, authResponse.user);
-      print('✅ Login successful for: ${authResponse.user.name}');
+      
       return authResponse;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Login failed';
-      print('❌ Login failed: $message');
+      
       throw Exception(message);
     }
   }
@@ -174,10 +173,10 @@ class ApiService {
       final data = jsonDecode(response.body);
       final user = User.fromJson(data['data']);
       _currentUser = user;
-      print('✅ Current user retrieved: ${user.name}');
+      
       return user;
     } else {
-      print('❌ Failed to get current user');
+      
       throw Exception('Failed to get current user');
     }
   }
@@ -189,7 +188,7 @@ class ApiService {
     int page = 1,
     int limit = 20,
   }) async {
-    print('🍽️ Fetching menu items...');
+    
 
     try {
       final queryParams = <String, String>{
@@ -207,8 +206,8 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-        print('📊 Menu API Response: $data'); // Debug log
-        print('📊 Response keys: ${data.keys.toList()}'); // Debug log
+        
+        
 
         // Handle different response structures
         List<dynamic> items = [];
@@ -219,14 +218,14 @@ class ApiService {
         } else if (data['data'] != null && data['data'] is List) {
           items = data['data'];
     } else {
-          print('⚠️ Unexpected menu response structure: $data');
+          
           return []; // Return empty list instead of throwing
         }
 
-        print('📊 Items array length: ${items.length}'); // Debug log
+        
 
         if (items.isEmpty) {
-          print('⚠️ No menu items found');
+          
           return [];
         }
 
@@ -234,11 +233,11 @@ class ApiService {
             .map((json) {
               try {
                 final item = MenuItem.fromJson(json);
-                print('✅ Parsed menu item: ${item.name} with image: ${item.imageUrl}');
+                
                 return item;
               } catch (e) {
-                print('❌ Error parsing menu item: $e');
-                print('❌ JSON data: $json');
+                
+                
                 return null;
               }
             })
@@ -246,21 +245,21 @@ class ApiService {
             .cast<MenuItem>()
             .toList();
 
-        print('✅ Retrieved ${menuItems.length} menu items');
+        
         return menuItems;
     } else {
-        print('❌ Failed to fetch menu items: ${response.statusCode}');
-        print('❌ Response body: ${response.body}');
+        
+        
         throw Exception('Failed to fetch menu items');
       }
     } catch (e) {
-      print('❌ Error in getMenuItems: $e');
+      
       return [];
     }
   }
 
   static Future<MenuItem> getMenuItem(String id) async {
-    print('🍽️ Fetching menu item: $id');
+    
 
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/menu/$id'),
@@ -270,10 +269,10 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final menuItem = MenuItem.fromJson(data['data']);
-      print('✅ Retrieved menu item: ${menuItem.name}');
+      
       return menuItem;
     } else {
-      print('❌ Failed to fetch menu item: $id');
+      
       throw Exception('Failed to fetch menu item');
     }
   }
@@ -284,7 +283,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('📦 Creating order...');
+    
 
     final response = await _makeRequest(() => http.post(
           Uri.parse('$baseUrl/orders'),
@@ -295,12 +294,12 @@ class ApiService {
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
       final createdOrder = Order.fromJson(data['data']['order']);
-      print('✅ Order created successfully: ${createdOrder.id}');
+      
       return createdOrder;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to create order';
-      print('❌ Order creation failed: $message');
+      
       throw Exception(message);
     }
   }
@@ -314,7 +313,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('📋 Fetching orders...');
+    
 
     final queryParams = <String, String>{
       'page': page.toString(),
@@ -329,47 +328,47 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print('📊 Orders API Response: $data'); // Debug log
-      print('📊 Response type: ${data.runtimeType}'); // Debug log
+      
+      
 
       List<dynamic> orders = [];
       if (data is List) {
         // Backend returns orders directly as array
         orders = data;
-        print('📊 Parsing as direct array with ${orders.length} items');
+        
       } else if (data['data'] != null && data['data'] is List) {
         // Backend returns orders in data field as array
         orders = data['data'];
-        print('📊 Parsing as data array with ${orders.length} items');
+        
       } else if (data['data'] != null && data['data']['orders'] != null) {
         // Backend returns orders in data.orders field
         orders = data['data']['orders'];
-        print('📊 Parsing as data.orders array with ${orders.length} items');
+        
       } else {
-        print('⚠️ Unexpected orders response structure: $data');
+        
         return [];
       }
 
-      print('📊 Processing ${orders.length} orders...');
+      
       final orderList = <Order>[];
 
       for (int i = 0; i < orders.length; i++) {
         try {
           final orderJson = orders[i];
-          print('📊 Processing order $i: $orderJson');
+          
           final order = Order.fromJson(orderJson);
           orderList.add(order);
         } catch (e) {
-          print('❌ Error processing order $i: $e');
-          print('❌ Order data: ${orders[i]}');
+          
+          
         }
       }
 
-      print('✅ Retrieved ${orderList.length} orders');
+      
       return orderList;
     } else {
-      print('❌ Failed to fetch orders: ${response.statusCode}');
-      print('❌ Response body: ${response.body}');
+      
+      
       throw Exception('Failed to fetch orders');
     }
   }
@@ -379,7 +378,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('📦 Fetching order: $id');
+    
 
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/orders/$id'),
@@ -389,10 +388,10 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final order = Order.fromJson(data['data']);
-      print('✅ Retrieved order: ${order.id}');
+      
       return order;
     } else {
-      print('❌ Failed to fetch order: $id');
+      
       throw Exception('Failed to fetch order');
     }
   }
@@ -402,7 +401,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('🔄 Updating order status: $id to $status');
+    
 
     final response = await _makeRequest(() => http.patch(
           Uri.parse('$baseUrl/orders/$id/status'),
@@ -413,10 +412,10 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final order = Order.fromJson(data['data']);
-      print('✅ Order status updated: ${order.id} to ${order.orderStatus}');
+      
       return order;
     } else {
-      print('❌ Failed to update order status: $id');
+      
       throw Exception('Failed to update order status');
     }
   }
@@ -427,7 +426,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('🛒 Fetching cart...');
+    
 
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/cart'),
@@ -437,10 +436,10 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final cart = Cart.fromJson(data['data']);
-      print('✅ Cart retrieved with ${cart.items.length} items');
+      
       return cart;
     } else {
-      print('❌ Failed to fetch cart');
+      
       throw Exception('Failed to fetch cart');
     }
   }
@@ -450,7 +449,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('➕ Adding to cart: $menuItemId x $quantity');
+    
 
     final response = await _makeRequest(() => http.post(
           Uri.parse('$baseUrl/cart/add'),
@@ -464,12 +463,12 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final cart = Cart.fromJson(data['data']);
-      print('✅ Item added to cart');
+      
       return cart;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to add to cart';
-      print('❌ Failed to add to cart: $message');
+      
       throw Exception(message);
     }
   }
@@ -479,7 +478,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('✏️ Updating cart item: $itemId to quantity $quantity');
+    
 
     final response = await _makeRequest(() => http.patch(
           Uri.parse('$baseUrl/cart/items/$itemId'),
@@ -490,10 +489,10 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final cart = Cart.fromJson(data['data']);
-      print('✅ Cart item updated');
+      
       return cart;
     } else {
-      print('❌ Failed to update cart item');
+      
       throw Exception('Failed to update cart item');
     }
   }
@@ -503,7 +502,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('🗑️ Removing from cart: $itemId');
+    
 
     final response = await _makeRequest(() => http.delete(
           Uri.parse('$baseUrl/cart/items/$itemId'),
@@ -511,9 +510,9 @@ class ApiService {
         ));
 
     if (response.statusCode == 200) {
-      print('✅ Item removed from cart');
+      
     } else {
-      print('❌ Failed to remove from cart');
+      
       throw Exception('Failed to remove from cart');
     }
   }
@@ -523,7 +522,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('🧹 Clearing cart...');
+    
 
     final response = await _makeRequest(() => http.delete(
           Uri.parse('$baseUrl/cart'),
@@ -531,9 +530,9 @@ class ApiService {
         ));
 
     if (response.statusCode == 200) {
-      print('✅ Cart cleared');
+      
     } else {
-      print('❌ Failed to clear cart');
+      
       throw Exception('Failed to clear cart');
     }
   }
@@ -544,7 +543,7 @@ class ApiService {
       await createOrder(order);
       return true;
     } catch (e) {
-      print('❌ Failed to post order: $e');
+      
       return false;
     }
   }
@@ -558,7 +557,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('💳 Initiating M-Pesa payment for order: $orderId');
+    
 
     final response = await _makeRequest(() => http.post(
       Uri.parse('$baseUrl/payments/mpesa/initiate'),
@@ -572,12 +571,12 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final paymentResponse = PaymentResponse.fromJson(data);
-      print('✅ M-Pesa payment initiated successfully');
+      
       return paymentResponse;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to initiate payment';
-      print('❌ M-Pesa payment initiation failed: $message');
+      
       throw Exception(message);
     }
   }
@@ -587,7 +586,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('🔍 Checking payment status: $paymentId');
+    
 
     final response = await _makeRequest(() => http.get(
       Uri.parse('$baseUrl/payments/status/$paymentId'),
@@ -597,10 +596,10 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final paymentData = PaymentData.fromJson(data['data']);
-      print('✅ Payment status checked');
+      
       return paymentData;
     } else {
-      print('❌ Failed to check payment status');
+      
       throw Exception('Failed to check payment status');
     }
   }
@@ -613,7 +612,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('📊 Fetching payment history...');
+    
 
     final queryParams = <String, String>{
       'page': page.toString(),
@@ -630,10 +629,10 @@ class ApiService {
       final List<dynamic> payments = data['data']['payments'];
       final paymentList =
           payments.map((json) => Payment.fromJson(json)).toList();
-      print('✅ Retrieved ${paymentList.length} payment records');
+      
       return paymentList;
     } else {
-      print('❌ Failed to load payment history');
+      
       throw Exception('Failed to load payment history');
     }
   }
@@ -644,7 +643,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('📈 Fetching dashboard stats...');
+    
 
     final response = await _makeRequest(() => http.get(
       Uri.parse('$baseUrl/admin/dashboard'),
@@ -654,10 +653,10 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final stats = DashboardStats.fromJson(data['data']);
-      print('✅ Dashboard stats retrieved');
+      
       return stats;
     } else {
-      print('❌ Failed to fetch dashboard stats');
+      
       throw Exception('Failed to fetch dashboard stats');
     }
   }
@@ -673,7 +672,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('📋 Fetching admin orders...');
+    
 
     final queryParams = <String, String>{
       'page': page.toString(),
@@ -692,10 +691,10 @@ class ApiService {
       final data = jsonDecode(response.body);
       final List<dynamic> orders = data['data']['orders'];
       final orderList = orders.map((json) => Order.fromJson(json)).toList();
-      print('✅ Retrieved ${orderList.length} admin orders');
+      
       return orderList;
     } else {
-      print('❌ Failed to fetch admin orders');
+      
       throw Exception('Failed to fetch admin orders');
     }
   }
@@ -705,7 +704,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('🔄 Admin updating order status: $id to $status');
+    
 
     final response = await _makeRequest(() => http.patch(
           Uri.parse('$baseUrl/admin/orders/$id/status'),
@@ -716,11 +715,11 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final order = Order.fromJson(data['data']);
-      print(
-          '✅ Admin order status updated: ${order.id} to ${order.orderStatus}');
+      
+         
       return order;
     } else {
-      print('❌ Failed to update admin order status: $id');
+      
       throw Exception('Failed to update admin order status');
     }
   }
@@ -768,7 +767,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('👥 Fetching admin customers...');
+    
 
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/admin/customers'),
@@ -780,10 +779,10 @@ class ApiService {
       final List<dynamic> customers = data['data']['customers'];
       final customerList =
           customers.map((json) => AdminCustomer.fromJson(json)).toList();
-      print('✅ Retrieved ${customerList.length} customers');
+      
       return customerList;
     } else {
-      print('❌ Failed to fetch admin customers');
+      
       throw Exception('Failed to fetch admin customers');
     }
   }
@@ -793,7 +792,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('🍽️ Fetching admin menu items...');
+    
 
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/admin/menu'),
@@ -805,10 +804,10 @@ class ApiService {
       final List<dynamic> items = data['data']['items'];
       final menuItems =
           items.map((json) => AdminMenuItem.fromJson(json)).toList();
-      print('✅ Retrieved ${menuItems.length} admin menu items');
+      
       return menuItems;
     } else {
-      print('❌ Failed to fetch admin menu items');
+      
       throw Exception('Failed to fetch admin menu items');
     }
   }
@@ -818,7 +817,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('➕ Creating menu item: ${menuItem.name}');
+    
 
     final response = await _makeRequest(() => http.post(
       Uri.parse('$baseUrl/admin/menu'),
@@ -829,12 +828,12 @@ class ApiService {
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
       final createdItem = AdminMenuItem.fromJson(data['data']);
-      print('✅ Menu item created: ${createdItem.name}');
+      
       return createdItem;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to create menu item';
-      print('❌ Failed to create menu item: $message');
+      
       throw Exception(message);
     }
   }
@@ -845,7 +844,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('✏️ Updating menu item: $id');
+    
 
     final response = await _makeRequest(() => http.put(
           Uri.parse('$baseUrl/admin/menu/$id'),
@@ -856,12 +855,12 @@ class ApiService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final updatedItem = AdminMenuItem.fromJson(data['data']);
-      print('✅ Menu item updated: ${updatedItem.name}');
+      
       return updatedItem;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to update menu item';
-      print('❌ Failed to update menu item: $message');
+      
       throw Exception(message);
     }
   }
@@ -871,7 +870,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('🗑️ Deleting menu item: $id');
+    
 
     final response = await _makeRequest(() => http.delete(
           Uri.parse('$baseUrl/admin/menu/$id'),
@@ -879,11 +878,11 @@ class ApiService {
         ));
 
     if (response.statusCode == 200) {
-      print('✅ Menu item deleted: $id');
+      
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to delete menu item';
-      print('❌ Failed to delete menu item: $message');
+      
       throw Exception(message);
     }
   }
@@ -893,7 +892,7 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    print('💰 Fetching admin payments...');
+    
 
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/admin/payments'),
@@ -905,10 +904,10 @@ class ApiService {
       final List<dynamic> payments = data['data']['payments'];
       final paymentList =
           payments.map((json) => AdminPayment.fromJson(json)).toList();
-      print('✅ Retrieved ${paymentList.length} admin payments');
+      
       return paymentList;
     } else {
-      print('❌ Failed to fetch admin payments');
+      
       throw Exception('Failed to fetch admin payments');
     }
   }
@@ -944,7 +943,7 @@ class ApiService {
 
   // Phone verification methods
   static Future<bool> sendPhoneOtp(String phoneNumber) async {
-    print('📱 Sending OTP to: $phoneNumber');
+    
 
     final response = await _makeRequest(() => http.post(
           Uri.parse('$baseUrl/auth/send-otp'),
@@ -953,18 +952,18 @@ class ApiService {
         ));
 
     if (response.statusCode == 200) {
-      print('✅ OTP sent successfully');
+      
       return true;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to send OTP';
-      print('❌ Failed to send OTP: $message');
+      
       throw Exception(message);
     }
   }
 
   static Future<bool> verifyPhoneOtp(String phoneNumber, String otp) async {
-    print('🔐 Verifying OTP for: $phoneNumber');
+    
 
     final response = await _makeRequest(() => http.post(
           Uri.parse('$baseUrl/auth/verify-otp'),
@@ -976,12 +975,12 @@ class ApiService {
         ));
 
     if (response.statusCode == 200) {
-      print('✅ Phone verification successful');
+      
       return true;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to verify OTP';
-      print('❌ Failed to verify OTP: $message');
+      
       throw Exception(message);
     }
   }
@@ -991,3 +990,4 @@ class ApiService {
     return getOrders();
   }
 }
+
