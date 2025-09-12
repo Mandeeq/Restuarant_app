@@ -85,7 +85,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     (index) => DotIndicator(
                   isActive: index == currentPage,
                   activeColor: primaryColor,
-                  inActiveColor: Colors.grey[300]!,
+                  inActiveColor: Colors.red[300]!,
                 ),
               ),
             ),
@@ -167,7 +167,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           );
                         },
                         child: Text(
-                          "Next",
+                          "",
                           style: TextStyle(
                             color: primaryColor,
                             fontWeight: FontWeight.w600,
@@ -191,17 +191,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 // Demo data for our Onboarding screen
 List<Map<String, dynamic>> demoData = [
   {
-    "illustration": "assets/Illustrations/Illustrations_1.svg",
+    "illustration": "assets/images/onboarding1-removebg-preview.png",
     "title": "Get your favorite meal",
     "text": "Order from the best restaurant around with easy, on-demand delivery.",
   },
   {
-    "illustration": "assets/Illustrations/Illustrations_2.svg",
+    "illustration": "assets/images/onboarding1-removebg-preview.png",
     "title": "Free delivery offers",
     "text": "Free delivery for new customers via Apple Pay and other payment methods.",
   },
   {
-    "illustration": "assets/Illustrations/Illustrations_3.svg",
+    "illustration": "assets/images/onboarding1-removebg-preview.png",
     "title": "Choose your food",
     "text": "Easily find your type of food craving and you'll get delivery in wide range.",
   },
