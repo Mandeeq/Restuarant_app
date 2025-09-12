@@ -1,12 +1,12 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import '../../components/welcome_text.dart';
 import '../../theme.dart';
 import '../../services/api_service.dart';
 import 'sign_up_screen.dart';
 import 'forgot_password_screen.dart';
 import '../../entry_point.dart';
 import '../admin/admin_dashboard_screen.dart';
+import 'components/welcome_text.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -94,36 +94,85 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 32),
+      body: Stack(
+      children: [
+        // Curved background
+        Positioned.fill(
+          child: Column(
+            children: [
+              Expanded(
+                flex: 4,
+                child: ClipPath(
+                  clipper: CurvedClipper(),
+                  child: Container(color: primaryColor),
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Container(color: backgroundColor),
+              ),
+            ],
+          ),
+        ),
+
+        // Foreground content
+        SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  // Title centered on the curve
+                  Center(
+                    child: Container(
+                      height: 250,
+                      width: 250,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/onboarding1-removebg-preview.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )
+                  ),
+                  const SizedBox(height: 20),
 
                 // Welcome section with restaurant branding
                 Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: cardColor,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                    padding: const EdgeInsets.all(20),
+                    // decoration: BoxDecoration(
+                    //   color: Colors.white,
+                    //   borderRadius: BorderRadius.circular(20),
+                    //   boxShadow: [
+                    //     BoxShadow(
+                    //       color: Colors.black.withOpacity(0.05),
+                    //       blurRadius: 10,
+                    //       offset: const Offset(0, 4),
+                    //     ),
+                    //   ],
+                    // ),
+                    child: const WelcomeText(
+  title: 'Welcome to Qaffee Point',
+  text: 'Enter your credentials to enjoy our delicious offerings',
+  titleStyle: TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.w800,
+    color: Colors.brown,
+    letterSpacing: 1.2,
+  ),
+  textStyle: TextStyle(
+    fontSize: 16,
+    color: Colors.black54,
+    height: 1.6,
+  ),
+),
+
                   ),
-                  child: const WelcomeText(
-                    title: 'Welcome to Qaffee Point',
-                    text: 'Enter your credentials to enjoy our delicious offerings',
-                  ),
-                ),
-                const SizedBox(height: 40),
+
+                  const SizedBox(height: 10),
 
                 // Email Field
                 Card(
@@ -142,7 +191,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 18,
+                        vertical: 12,
                       ),
                       filled: false,
                       fillColor: Colors.white,
@@ -188,7 +237,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 18,
+                        vertical: 12,
                       ),
                       filled: false,
                       fillColor: Colors.white,
@@ -331,6 +380,27 @@ class _SignInScreenState extends State<SignInScreen> {
           ),
         ),
       ),
+    ],
+    ),
     );
   }
+}
+
+
+class CurvedClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(0, size.height - 60);
+    path.quadraticBezierTo(
+      size.width / 2, size.height,
+      size.width, size.height - 60,
+    );
+    path.lineTo(size.width, 0);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

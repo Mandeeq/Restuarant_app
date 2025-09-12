@@ -5,8 +5,11 @@ import 'screens/onboarding/onboarding_scrreen.dart';
 import 'services/app_state_service.dart';
 import 'entry_point.dart';
 import 'screens/admin/admin_dashboard_screen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-void main() {
+Future main() async {
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -25,6 +28,10 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           useMaterial3: false,
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF603D35)),
+          textTheme: GoogleFonts.spaceGroteskTextTheme().copyWith(
+            bodyMedium: const TextStyle(color: Color(0xFF603D35)),
+            bodySmall: const TextStyle(color: Color(0xFF603D35)),
+          ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF603D35),
@@ -34,10 +41,6 @@ class MyApp extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-          ),
-          textTheme: const TextTheme(
-            bodyMedium: TextStyle(color: Color(0xFF603D35)),
-            bodySmall: TextStyle(color: Color(0xFF603D35)),
           ),
           inputDecorationTheme: const InputDecorationTheme(
             contentPadding: EdgeInsets.all(defaultPadding),

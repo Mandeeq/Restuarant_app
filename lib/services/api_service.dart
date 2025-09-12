@@ -8,10 +8,13 @@ import '../models/payment_model.dart';
 import '../models/admin_models.dart';
 import '../models/cart_model.dart';
 import '../models/auth_response.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
   // Use your computer IP address (same one used in MongoDB Compass/Postman)
-  static const String baseUrl = "http://192.12.1.105:5000/api";
+  static final baseUrl = "${dotenv.env['baseUrl'] ?? ""}/api";
+ 
+
 
   // Connection timeout settings
   static const Duration connectionTimeout = Duration(seconds: 10);

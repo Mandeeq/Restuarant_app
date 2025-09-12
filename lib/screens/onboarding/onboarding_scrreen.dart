@@ -196,7 +196,7 @@ List<Map<String, dynamic>> demoData = [
     "text": "Order from the best restaurant around with easy, on-demand delivery.",
   },
   {
-    "illustration": "assets/images/onboarding1-removebg-preview.png",
+    "illustration": "assets/images/onboarding2-removebg-preview.png",
     "title": "Free delivery offers",
     "text": "Free delivery for new customers via Apple Pay and other payment methods.",
   },

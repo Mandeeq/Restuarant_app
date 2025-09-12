@@ -1,5 +1,7 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class ImageUtils {
-  static const String baseUrl = 'http://192.12.1.105:5000';
+  static  String baseUrl = dotenv.env['baseUrl'] ?? "";
   static const String imagesPath = '/images';
 
   /// Constructs a full image URL from a relative path
