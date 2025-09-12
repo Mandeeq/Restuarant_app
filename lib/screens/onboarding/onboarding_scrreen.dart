@@ -167,7 +167,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           );
                         },
                         child: Text(
-                          "",
+                          "Next",
                           style: TextStyle(
                             color: primaryColor,
                             fontWeight: FontWeight.w600,

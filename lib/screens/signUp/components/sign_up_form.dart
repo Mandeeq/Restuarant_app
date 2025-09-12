@@ -91,100 +91,198 @@ class _SignUpFormState extends State<SignUpForm> {
       child: Column(
         children: [
           // Full Name Field
-          TextFormField(
-            validator: requiredValidator.call,
-            onSaved: (value) => _name = value,
-            textInputAction: TextInputAction.next,
-            decoration: const InputDecoration(hintText: "Full Name"),
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: TextFormField(
+              validator: requiredValidator.call,
+              onSaved: (value) => _name = value,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                labelText: "Full Name",
+                labelStyle: TextStyle(color: bodyTextColor),
+                prefixIcon: Icon(Icons.person_outline, color: primaryColor),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
+              ),
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
-          const SizedBox(height: defaultPadding),
+          const SizedBox(height: 20),
 
           // Email Field
-          TextFormField(
-            validator: emailValidator.call,
-            onSaved: (value) => _email = value,
-            textInputAction: TextInputAction.next,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(hintText: "Email Address"),
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: TextFormField(
+              validator: emailValidator.call,
+              onSaved: (value) => _email = value,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: "Email Address",
+                labelStyle: TextStyle(color: bodyTextColor),
+                prefixIcon: Icon(Icons.email_outlined, color: primaryColor),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
+              ),
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
-          const SizedBox(height: defaultPadding),
+          const SizedBox(height: 20),
 
           // Phone Field
-          TextFormField(
-            onSaved: (value) => _phone = value,
-            textInputAction: TextInputAction.next,
-            keyboardType: TextInputType.phone,
-            decoration:
-                const InputDecoration(hintText: "Phone Number (Optional)"),
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: TextFormField(
+              onSaved: (value) => _phone = value,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.phone,
+              decoration: InputDecoration(
+                labelText: "Phone Number (Optional)",
+                labelStyle: TextStyle(color: bodyTextColor),
+                prefixIcon: Icon(Icons.phone_outlined, color: primaryColor),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
+              ),
+              style: const TextStyle(fontSize: 16),
+            ),
           ),
-          const SizedBox(height: defaultPadding),
+          const SizedBox(height: 20),
 
           // Password Field
-          TextFormField(
-            controller: _passwordController,
-            obscureText: _obscurePassword,
-            validator: passwordValidator.call,
-            textInputAction: TextInputAction.next,
-            decoration: InputDecoration(
-              hintText: "Password",
-              suffixIcon: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-                child: _obscurePassword
-                    ? const Icon(Icons.visibility_off, color: bodyTextColor)
-                    : const Icon(Icons.visibility, color: bodyTextColor),
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: TextFormField(
+              controller: _passwordController,
+              obscureText: _obscurePassword,
+              validator: passwordValidator.call,
+              textInputAction: TextInputAction.next,
+              decoration: InputDecoration(
+                labelText: "Password",
+                labelStyle: TextStyle(color: bodyTextColor),
+                prefixIcon: Icon(Icons.lock_outline, color: primaryColor),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    color: primaryColor,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
               ),
+              style: const TextStyle(fontSize: 16),
             ),
           ),
-          const SizedBox(height: defaultPadding),
+          const SizedBox(height: 20),
 
           // Confirm Password Field
-          TextFormField(
-            controller: _confirmPasswordController,
-            obscureText: _obscureConfirmPassword,
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please confirm your password';
-              }
-              if (value != _passwordController.text) {
-                return 'Passwords do not match';
-              }
-              return null;
-            },
-            decoration: InputDecoration(
-              hintText: "Confirm Password",
-              suffixIcon: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _obscureConfirmPassword = !_obscureConfirmPassword;
-                  });
-                },
-                child: _obscureConfirmPassword
-                    ? const Icon(Icons.visibility_off, color: bodyTextColor)
-                    : const Icon(Icons.visibility, color: bodyTextColor),
+          Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: TextFormField(
+              controller: _confirmPasswordController,
+              obscureText: _obscureConfirmPassword,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please confirm your password';
+                }
+                if (value != _passwordController.text) {
+                  return 'Passwords do not match';
+                }
+                return null;
+              },
+              decoration: InputDecoration(
+                labelText: "Confirm Password",
+                labelStyle: TextStyle(color: bodyTextColor),
+                prefixIcon: Icon(Icons.lock_outline, color: primaryColor),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureConfirmPassword
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    color: primaryColor,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscureConfirmPassword = !_obscureConfirmPassword;
+                    });
+                  },
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
               ),
+              style: const TextStyle(fontSize: 16),
             ),
           ),
-          const SizedBox(height: defaultPadding),
+          const SizedBox(height: 30),
 
           // Sign Up Button
           SizedBox(
             width: double.infinity,
+            height: 54,
             child: ElevatedButton(
               onPressed: _isLoading ? null : _register,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 14),
+              ),
               child: _isLoading
                   ? const SizedBox(
-                      height: 20,
-                      width: 20,
+                      height: 24,
+                      width: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        color: Colors.white,
                       ),
                     )
-                  : const Text("Sign Up"),
+                  : const Text(
+                      "SIGN UP",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
             ),
           ),
         ],

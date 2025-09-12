@@ -1,5 +1,5 @@
 class ImageUtils {
-  static const String baseUrl = 'http://192.168.1.104:5000';
+  static const String baseUrl = 'http://192.12.1.105:5000';
   static const String imagesPath = '/images';
 
   /// Constructs a full image URL from a relative path

@@ -90,7 +90,7 @@ class _SignInScreenState extends State<SignInScreen> {
         foregroundColor: Colors.white,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(20),
+            bottom: Radius.circular(2),
           ),
         ),
       ),

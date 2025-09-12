@@ -236,7 +236,7 @@ class _MenuScreenState extends State<MenuScreen> {
                         ),
                         child: Image.network(
                           item.imageUrl,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                           width: double.infinity,
                           errorBuilder: (context, error, stackTrace) {
                             print('❌ Image loading error for ${item.name}: $error');
@@ -298,7 +298,7 @@ class _MenuScreenState extends State<MenuScreen> {
                             const SizedBox(height: 2), // Reduced spacing
                             // Price
                             Text(
-                              "\$${item.price.toStringAsFixed(2)}",
+                              "\Ksh. ${item.price.toStringAsFixed(2)}",
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
