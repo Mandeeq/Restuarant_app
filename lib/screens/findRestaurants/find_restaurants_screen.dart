@@ -35,6 +35,17 @@ class FindRestaurantsScreen extends StatelessWidget {
                 title: "Find restaurants near you ",
                 text:
                     "Please enter your location or allow access to \nyour location to find restaurants near you.",
+                titleStyle: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.brown,
+                  letterSpacing: 1.2,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black54,
+                  height: 1.6,
+                ),
               ),
 
               // Getting Current Location

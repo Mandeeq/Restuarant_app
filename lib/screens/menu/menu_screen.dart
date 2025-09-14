@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import '../../theme.dart';
 import '../../models/menu_item_model.dart';
 import '../../services/api_service.dart';
-
 import '../payment/cart_page.dart';
-import 'menu_item_screen.dart'; // Make sure the path is correct
+import 'menu_item_screen.dart';
 
 class MenuScreen extends StatefulWidget {
   final List<String> cartItems;
@@ -71,13 +70,32 @@ class _MenuScreenState extends State<MenuScreen> {
     _loadMenuItems(category: category);
   }
 
+  // Helper method to build star rating widget
+  Widget _buildRatingStars(double rating) {
+    return Row(
+      children: List.generate(1, (index) {
+        return Icon(
+          index < rating.floor() ? Icons.star : Icons.star_border,
+          color: Colors.amber,
+          size: 12,
+        );
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget buildCategoryChip(BuildContext context, String category, bool isSelected) {
       return Padding(
         padding: const EdgeInsets.only(right: 8),
         child: ChoiceChip(
-          label: Text(category.toUpperCase()),
+          label: Text(
+            category.toUpperCase(),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           selected: isSelected,
           onSelected: (_) => _onCategoryChanged(category),
           selectedColor: Theme.of(context).colorScheme.primary,
@@ -87,39 +105,43 @@ class _MenuScreenState extends State<MenuScreen> {
                 : Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.bold,
           ),
-          backgroundColor: Colors.grey[200],
+          backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
         ),
       );
     }
+
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text('Menu'),
+        title: const Text(
+          'Menu',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
         centerTitle: true,
         elevation: 0,
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
-          // ✅ Category Filter with Chips
+          // Category Filter Chips
           Container(
             height: 60,
             padding: const EdgeInsets.symmetric(vertical: 8),
-            decoration: BoxDecoration( // <--- Add this decoration
-              color: Theme.of(context).canvasColor, // Or your specific background color for this bar
+            decoration: BoxDecoration(
+              color: Colors.white,
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey.shade400, // Choose a subtle color for the border
-                  width: 1.0, // Adjust width as needed, 1.0 is usually good for a subtle line
+                  color: Colors.red.shade200,
+                  width: 1.2,
                 ),
               ),
-              // Optional: Add a subtle shadow for more depth
-              // boxShadow: [
-              //   BoxShadow(
-              //     color: Colors.grey.withOpacity(0.2),
-              //     spreadRadius: 1,
-              //     blurRadius: 3,
-              //     offset: Offset(0, 2), // changes position of shadow
-              //   ),
-              // ],
             ),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
@@ -128,13 +150,12 @@ class _MenuScreenState extends State<MenuScreen> {
               itemBuilder: (context, index) {
                 final category = _categories[index];
                 final isSelected = category == _selectedCategory;
-                // Using the extracted widget or method as previously discussed
-                return buildCategoryChip(context, category, isSelected); // Or CategoryChipItem(...)
+                return buildCategoryChip(context, category, isSelected);
               },
             ),
           ),
 
-          // ✅ Menu Items
+          // Menu Items List
           Expanded(child: _buildMenuContent(context)),
         ],
       ),
@@ -169,189 +190,190 @@ class _MenuScreenState extends State<MenuScreen> {
       );
     }
 
-    // ✅ Modern grid layout with proper sizing to prevent overflow
-    return GridView.builder(
+    return ListView.builder(
       padding: const EdgeInsets.all(defaultPadding),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, // 2 items per row
-        crossAxisSpacing: defaultPadding,
-        mainAxisSpacing: defaultPadding,
-        childAspectRatio: 0.8, // Increased height to prevent overflow
-      ),
       itemCount: _menuItems.length,
+
       itemBuilder: (context, index) {
         final item = _menuItems[index];
-        return GestureDetector(
-          onTap: () {
-            widget.onAddToCart(item.name);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Added ${item.name} to cart'),
-                action: SnackBarAction(
-                  label: 'View Cart',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            CartPage(cartItems: widget.cartItems),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
-          },
-          child: SizedBox(
-            height: 280, // Fixed height to prevent overflow
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              elevation: 1,
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: () {
-                  // 👉 Navigate to detail screen when tapping card (not the button)
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MenuItemScreen(
-                        menuItem: item,
-                        onAddToCart: widget.onAddToCart,
-                        cartItems: widget.cartItems,
+        return Container(
+          margin: const EdgeInsets.only(bottom: 4),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 1,
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MenuItemScreen(
+                      menuItem: item,
+                      onAddToCart: widget.onAddToCart,
+                      cartItems: widget.cartItems,
+                    ),
+                  ),
+                );
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Food Image
+                  Container(
+                    width: 120,
+                    height: 120,
+                    child: ClipRRect(
+                      child: Image.network(
+                        item.imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.fastfood, size: 40, color: Colors.grey),
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            color: Colors.grey[200],
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ),
-                  );
-                },
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // ✅ Image with fixed height
-                    SizedBox(
-                      height: 100, // Reduced height to give more space for content
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(14),
-                        ),
-                        child: Image.network(
-                          item.imageUrl,
-                          fit: BoxFit.contain,
-                          width: double.infinity,
-                          errorBuilder: (context, error, stackTrace) {
-                            print('❌ Image loading error for ${item.name}: $error');
-                            print('❌ Image URL: ${item.imageUrl}');
-                            return Container(
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                            );
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              color: Colors.grey[200],
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
+                  ),
+
+                  // Content Area
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Food Name
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // Food Name
+                              Expanded(
+                                child: Text(
+                                  item.name,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    // ✅ Content with compact spacing
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Title with single line constraint
-                            Text(
-                              item.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14, // Slightly smaller title
+
+                              // Rating and Reviews
+                              Row(
+                                children: [
+                                  _buildRatingStars(4.5),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '4.5(30)',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
                                   ),
-                              maxLines: 1,
+                                ],
+                              ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 6),
+
+                          // Description
+                          // Description with fixed min height for 3 lines
+                          Container(
+                            constraints: BoxConstraints(minHeight: 36), // Minimum height for 3 lines
+                            child: Text(
+                              item.description,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                                height: 1.3,
+                              ),
+                              maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 2), // Reduced spacing
-                            // Description with strict line limit
-                            Expanded(
-                              child: Text(
-                                item.description,
-                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  fontSize: 10, // Even smaller font to fit better
+                          ),
+
+                          const SizedBox(height: 8),
+
+                          // Price and Add Button
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "\Ksh ${item.price.toStringAsFixed(2)}",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.green[800],
                                 ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            const SizedBox(height: 2), // Reduced spacing
-                            // Price
-                            Text(
-                              "\Ksh. ${item.price.toStringAsFixed(2)}",
-                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13, // Slightly smaller price
-                              ),
-                            ),
-                            // const SizedBox(height: 2), // Reduced spacing
-                            // Order Button
-                        SizedBox(
-                          width: double.infinity,
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary, // ✅ fill with primary
-                              foregroundColor: Colors.white, // ✅ text color
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              minimumSize: const Size(0, 28),
-                            ),
-                            onPressed: () {
-                              widget.onAddToCart(item.name);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Added ${item.name} to cart'),
-                                  action: SnackBarAction(
-                                    label: 'View Cart',
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              CartPage(cartItems: widget.cartItems),
-                                        ),
-                                      );
-                                    },
+
+                              // Add Button
+                              InkWell(
+                                onTap: () {
+                                  widget.onAddToCart(item.name);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Added ${item.name} to cart'),
+                                      action: SnackBarAction(
+                                        label: 'View Cart',
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CartPage(cartItems: widget.cartItems),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red[400],
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: const Text(
+                                    '+ Add',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
                                   ),
                                 ),
-                              );
-                            },
-                            child: const Text(
-                              "Order",
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-                            ),
+                              ),
+                            ],
                           ),
-                        ),
-
                         ],
-                        ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

@@ -21,7 +21,17 @@ class ForgotPasswordScreen extends StatelessWidget {
             WelcomeText(
                 title: "Forgot password",
                 text:
-                    "Enter your email address and we will \nsend you a reset instructions."),
+                    "Enter your email address and we will \nsend you a reset instructions.", titleStyle: const TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              color: Colors.brown,
+              letterSpacing: 1.2,
+            ),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+                height: 1.6,
+              ),),
             SizedBox(height: defaultPadding),
             ForgotPassForm(),
           ],

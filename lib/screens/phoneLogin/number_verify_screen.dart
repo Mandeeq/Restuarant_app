@@ -36,7 +36,7 @@ class _NumberVerifyScreenState extends State<NumberVerifyScreen> {
       } else {
         setState(() {
           _errorMessage =
-              'No phone number found. Please update your profile first.';
+          'No phone number found. Please update your profile first.';
           _isLoading = false;
         });
       }
@@ -94,9 +94,20 @@ class _NumberVerifyScreenState extends State<NumberVerifyScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const WelcomeText(
+              WelcomeText(
                 title: "Verify phone number",
                 text: "Enter the 6-Digit code sent to you at",
+                titleStyle: const TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.brown,
+                  letterSpacing: 1.2,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black54,
+                  height: 1.6,
+                ),
               ),
 
               if (_phoneNumber.isNotEmpty)

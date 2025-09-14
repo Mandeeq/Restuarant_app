@@ -4,7 +4,7 @@ import '../theme.dart';
 class WelcomeText extends StatelessWidget {
   final String title, text;
 
-  const WelcomeText({super.key, required this.title, required this.text});
+  const WelcomeText({super.key, required this.title, required this.text, required TextStyle titleStyle, required TextStyle textStyle});
   @override
   Widget build(BuildContext context) {
     return Column(
