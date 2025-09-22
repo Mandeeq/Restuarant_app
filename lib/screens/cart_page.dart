@@ -1,66 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../screens/statemanagement/cart_provider.dart';
 import 'checkout_page.dart';
 
-class CartPage extends StatefulWidget {
-  final List<String> cartItems;
+class CartPage extends StatelessWidget {
+  const CartPage({super.key});
 
-  const CartPage({super.key, required this.cartItems});
-
-  @override
-  State<CartPage> createState() => _CartPageState();
-}
-
-class _CartPageState extends State<CartPage> {
-  late List<String> items;
-
-  final Map<String, double> itemPrices = {
-    'Espresso': 3.50,
-    'Cappuccino': 4.00,
-    'Latte': 4.25,
-    'Mocha': 4.50,
-    'Americano': 3.75,
-    'Flat White': 4.00,
-    'Macchiato': 3.80,
-    'Cold Brew': 4.25,
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    items = List.from(widget.cartItems);
-  }
-
-  void removeItem(int index) {
-    setState(() {
-      items.removeAt(index);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Item removed from cart'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        backgroundColor: Colors.brown[600],
-      ),
-    );
-  }
-
-  void checkout() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CheckoutPage(cartItems: items),
-      ),
-    );
-  }
-
-  double calculateTotal() {
+  double calculateTotal(Map<String, double> itemPrices, List<String> items) {
     return items.fold(0, (sum, item) => sum + (itemPrices[item] ?? 0));
   }
 
   @override
   Widget build(BuildContext context) {
+    final cart = context.watch<CartProvider>();
+
+    final Map<String, double> itemPrices = {
+      'Espresso': 3.50,
+      'Cappuccino': 4.00,
+      'Latte': 4.25,
+      'Mocha': 4.50,
+      'Americano': 3.75,
+      'Flat White': 4.00,
+      'Macchiato': 3.80,
+      'Cold Brew': 4.25,
+    };
+
     return Scaffold(
       backgroundColor: Colors.brown[50],
       appBar: AppBar(
@@ -77,7 +41,7 @@ class _CartPageState extends State<CartPage> {
       body: Column(
         children: [
           Expanded(
-            child: items.isEmpty
+            child: cart.items.isEmpty
                 ? Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -104,7 +68,7 @@ class _CartPageState extends State<CartPage> {
                 : ListView.builder(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    itemCount: items.length,
+                    itemCount: cart.items.length,
                     itemBuilder: (context, index) => Card(
                       elevation: 3,
                       shadowColor: Colors.brown[100],
@@ -125,12 +89,12 @@ class _CartPageState extends State<CartPage> {
                               color: Colors.brown[700], size: 28),
                         ),
                         title: Text(
-                          items[index],
+                          cart.items[index],
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                         subtitle: Text(
-                          '\$${(itemPrices[items[index]] ?? 0).toStringAsFixed(2)}',
+                          '\$${(itemPrices[cart.items[index]] ?? 0).toStringAsFixed(2)}',
                           style: TextStyle(
                               color: Colors.brown[600],
                               fontWeight: FontWeight.w600),
@@ -138,17 +102,32 @@ class _CartPageState extends State<CartPage> {
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline,
                               color: Colors.red),
-                          onPressed: () => removeItem(index),
+                          onPressed: () {
+                           final removed = cart.items[index];
+cart.removeItem(index); // ✅ pass index
+
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('$removed removed from cart'),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                backgroundColor: Colors.brown[600],
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
                   ),
           ),
-          if (items.isNotEmpty)
+          if (cart.items.isNotEmpty)
             SafeArea(
               child: Padding(
                 padding: const EdgeInsets.only(
-                    left: 20, right: 20, top: 16, bottom: 24), // bottom increased
+                    left: 20, right: 20, top: 16, bottom: 24),
                 child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -172,12 +151,12 @@ class _CartPageState extends State<CartPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Total (${items.length} items)',
+                            'Total (${cart.items.length} items)',
                             style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500),
                           ),
                           Text(
-                            '\$${calculateTotal().toStringAsFixed(2)}',
+                            '\$${calculateTotal(itemPrices, cart.items).toStringAsFixed(2)}',
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -187,7 +166,14 @@ class _CartPageState extends State<CartPage> {
                       ),
                       const SizedBox(height: 12),
                       ElevatedButton(
-                        onPressed: checkout,
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CheckoutPage(),
+                            ),
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.brown[700],
                           elevation: 3,

@@ -12,8 +12,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
   // Use your computer IP address (same one used in MongoDB Compass/Postman)
-  static final baseUrl = "${dotenv.env['baseUrl'] ?? ""}/api";
- 
+  static const String baseUrl = "http://192.168.100.8:5000";  // ✅ Use your actual IP + port
+
 
 
   // Connection timeout settings
