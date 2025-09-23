@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/order_model.dart';
@@ -12,9 +11,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ApiService {
   // Use your computer IP address (same one used in MongoDB Compass/Postman)
-  static final baseUrl = "${dotenv.env['baseUrl'] ?? ""}/api";
- 
-
+  static const String baseUrl =
+      "http://192.168.100.8:5000"; // ✅ Use your actual IP + port
 
   // Connection timeout settings
   static const Duration connectionTimeout = Duration(seconds: 10);
@@ -35,14 +33,12 @@ class ApiService {
   static void setAuthData(String token, User user) {
     _authToken = token;
     _currentUser = user;
-    
   }
 
   // Clear authentication data
   static void clearAuthData() {
     _authToken = null;
     _currentUser = null;
-    
   }
 
   // Get headers with authentication
@@ -60,18 +56,17 @@ class ApiService {
   // Test connection with better error handling
   static Future<bool> testConnection() async {
     try {
-      
       final response = await http.get(
         Uri.parse('$baseUrl/health'),
         headers: {'Content-Type': 'application/json'},
       ).timeout(connectionTimeout);
 
       _isConnected = response.statusCode == 200;
-      
+
       return _isConnected;
     } catch (e) {
       _isConnected = false;
-      
+
       return false;
     }
   }
@@ -88,7 +83,7 @@ class ApiService {
         return response;
       } catch (e) {
         attempts++;
-        
+
         if (attempts >= maxRetries) {
           throw Exception('Request failed after $maxRetries attempts: $e');
         }
@@ -106,29 +101,27 @@ class ApiService {
     required String password,
     String? phone,
   }) async {
-    
-
     final response = await _makeRequest(() => http.post(
-      Uri.parse('$baseUrl/auth/register'),
-      headers: _headers,
-      body: jsonEncode({
-        'name': name,
-        'email': email,
-        'password': password,
-        if (phone != null) 'phone': phone,
-      }),
+          Uri.parse('$baseUrl/auth/register'),
+          headers: _headers,
+          body: jsonEncode({
+            'name': name,
+            'email': email,
+            'password': password,
+            if (phone != null) 'phone': phone,
+          }),
         ));
 
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
       final authResponse = AuthResponse.fromJson(data);
       setAuthData(authResponse.token, authResponse.user);
-      
+
       return authResponse;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Registration failed';
-      
+
       throw Exception(message);
     }
   }
@@ -137,27 +130,25 @@ class ApiService {
     required String email,
     required String password,
   }) async {
-    
-
     final response = await _makeRequest(() => http.post(
-      Uri.parse('$baseUrl/auth/login'),
-      headers: _headers,
-      body: jsonEncode({
-        'email': email,
-        'password': password,
-      }),
+          Uri.parse('$baseUrl/auth/login'),
+          headers: _headers,
+          body: jsonEncode({
+            'email': email,
+            'password': password,
+          }),
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final authResponse = AuthResponse.fromJson(data);
       setAuthData(authResponse.token, authResponse.user);
-      
+
       return authResponse;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Login failed';
-      
+
       throw Exception(message);
     }
   }
@@ -168,18 +159,17 @@ class ApiService {
     }
 
     final response = await _makeRequest(() => http.get(
-      Uri.parse('$baseUrl/auth/me'),
-      headers: _headers,
+          Uri.parse('$baseUrl/auth/me'),
+          headers: _headers,
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final user = User.fromJson(data['data']);
       _currentUser = user;
-      
+
       return user;
     } else {
-      
       throw Exception('Failed to get current user');
     }
   }
@@ -191,8 +181,6 @@ class ApiService {
     int page = 1,
     int limit = 20,
   }) async {
-    
-
     try {
       final queryParams = <String, String>{
         'page': page.toString(),
@@ -201,16 +189,14 @@ class ApiService {
         if (search != null) 'search': search,
       };
 
-    final uri =
-        Uri.parse('$baseUrl/menu').replace(queryParameters: queryParams);
+      final uri =
+          Uri.parse('$baseUrl/menu').replace(queryParameters: queryParams);
 
       final response =
           await _makeRequest(() => http.get(uri, headers: _headers));
 
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-        
-        
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
 
         // Handle different response structures
         List<dynamic> items = [];
@@ -220,15 +206,11 @@ class ApiService {
           items = data['data']['items'];
         } else if (data['data'] != null && data['data'] is List) {
           items = data['data'];
-    } else {
-          
+        } else {
           return []; // Return empty list instead of throwing
         }
 
-        
-
         if (items.isEmpty) {
-          
           return [];
         }
 
@@ -236,11 +218,9 @@ class ApiService {
             .map((json) {
               try {
                 final item = MenuItem.fromJson(json);
-                
+
                 return item;
               } catch (e) {
-                
-                
                 return null;
               }
             })
@@ -248,34 +228,27 @@ class ApiService {
             .cast<MenuItem>()
             .toList();
 
-        
         return menuItems;
-    } else {
-        
-        
+      } else {
         throw Exception('Failed to fetch menu items');
       }
     } catch (e) {
-      
       return [];
     }
   }
 
   static Future<MenuItem> getMenuItem(String id) async {
-    
-
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/menu/$id'),
-      headers: _headers,
+          headers: _headers,
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final menuItem = MenuItem.fromJson(data['data']);
-      
+
       return menuItem;
     } else {
-      
       throw Exception('Failed to fetch menu item');
     }
   }
@@ -286,23 +259,21 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.post(
           Uri.parse('$baseUrl/orders'),
-      headers: _headers,
+          headers: _headers,
           body: jsonEncode(order.toJson()),
         ));
 
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
       final createdOrder = Order.fromJson(data['data']['order']);
-      
+
       return createdOrder;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to create order';
-      
+
       throw Exception(message);
     }
   }
@@ -315,8 +286,6 @@ class ApiService {
     if (!isAuthenticated) {
       throw Exception('Authentication required');
     }
-
-    
 
     final queryParams = <String, String>{
       'page': page.toString(),
@@ -331,47 +300,34 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      
-      
 
       List<dynamic> orders = [];
       if (data is List) {
         // Backend returns orders directly as array
         orders = data;
-        
       } else if (data['data'] != null && data['data'] is List) {
         // Backend returns orders in data field as array
         orders = data['data'];
-        
       } else if (data['data'] != null && data['data']['orders'] != null) {
         // Backend returns orders in data.orders field
         orders = data['data']['orders'];
-        
       } else {
-        
         return [];
       }
 
-      
       final orderList = <Order>[];
 
       for (int i = 0; i < orders.length; i++) {
         try {
           final orderJson = orders[i];
-          
+
           final order = Order.fromJson(orderJson);
           orderList.add(order);
-        } catch (e) {
-          
-          
-        }
+        } catch (e) {}
       }
 
-      
       return orderList;
     } else {
-      
-      
       throw Exception('Failed to fetch orders');
     }
   }
@@ -381,20 +337,17 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/orders/$id'),
-      headers: _headers,
+          headers: _headers,
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final order = Order.fromJson(data['data']);
-      
+
       return order;
     } else {
-      
       throw Exception('Failed to fetch order');
     }
   }
@@ -404,21 +357,18 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.patch(
           Uri.parse('$baseUrl/orders/$id/status'),
-      headers: _headers,
+          headers: _headers,
           body: jsonEncode({'status': status}),
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final order = Order.fromJson(data['data']);
-      
+
       return order;
     } else {
-      
       throw Exception('Failed to update order status');
     }
   }
@@ -429,20 +379,17 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/cart'),
-      headers: _headers,
+          headers: _headers,
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final cart = Cart.fromJson(data['data']);
-      
+
       return cart;
     } else {
-      
       throw Exception('Failed to fetch cart');
     }
   }
@@ -452,26 +399,24 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.post(
           Uri.parse('$baseUrl/cart/add'),
-      headers: _headers,
-      body: jsonEncode({
+          headers: _headers,
+          body: jsonEncode({
             'menuItemId': menuItemId,
             'quantity': quantity,
-      }),
+          }),
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final cart = Cart.fromJson(data['data']);
-      
+
       return cart;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to add to cart';
-      
+
       throw Exception(message);
     }
   }
@@ -481,21 +426,18 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.patch(
           Uri.parse('$baseUrl/cart/items/$itemId'),
-      headers: _headers,
+          headers: _headers,
           body: jsonEncode({'quantity': quantity}),
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final cart = Cart.fromJson(data['data']);
-      
+
       return cart;
     } else {
-      
       throw Exception('Failed to update cart item');
     }
   }
@@ -505,17 +447,13 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.delete(
           Uri.parse('$baseUrl/cart/items/$itemId'),
-      headers: _headers,
+          headers: _headers,
         ));
 
     if (response.statusCode == 200) {
-      
     } else {
-      
       throw Exception('Failed to remove from cart');
     }
   }
@@ -525,17 +463,13 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.delete(
           Uri.parse('$baseUrl/cart'),
-      headers: _headers,
+          headers: _headers,
         ));
 
     if (response.statusCode == 200) {
-      
     } else {
-      
       throw Exception('Failed to clear cart');
     }
   }
@@ -546,7 +480,6 @@ class ApiService {
       await createOrder(order);
       return true;
     } catch (e) {
-      
       return false;
     }
   }
@@ -560,26 +493,24 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.post(
-      Uri.parse('$baseUrl/payments/mpesa/initiate'),
-      headers: _headers,
-      body: jsonEncode({
-        'orderId': orderId,
-        'phoneNumber': phoneNumber,
-      }),
+          Uri.parse('$baseUrl/payments/mpesa/initiate'),
+          headers: _headers,
+          body: jsonEncode({
+            'orderId': orderId,
+            'phoneNumber': phoneNumber,
+          }),
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final paymentResponse = PaymentResponse.fromJson(data);
-      
+
       return paymentResponse;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to initiate payment';
-      
+
       throw Exception(message);
     }
   }
@@ -589,20 +520,17 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.get(
-      Uri.parse('$baseUrl/payments/status/$paymentId'),
-      headers: _headers,
+          Uri.parse('$baseUrl/payments/status/$paymentId'),
+          headers: _headers,
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final paymentData = PaymentData.fromJson(data['data']);
-      
+
       return paymentData;
     } else {
-      
       throw Exception('Failed to check payment status');
     }
   }
@@ -614,8 +542,6 @@ class ApiService {
     if (!isAuthenticated) {
       throw Exception('Authentication required');
     }
-
-    
 
     final queryParams = <String, String>{
       'page': page.toString(),
@@ -632,10 +558,9 @@ class ApiService {
       final List<dynamic> payments = data['data']['payments'];
       final paymentList =
           payments.map((json) => Payment.fromJson(json)).toList();
-      
+
       return paymentList;
     } else {
-      
       throw Exception('Failed to load payment history');
     }
   }
@@ -646,20 +571,17 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.get(
-      Uri.parse('$baseUrl/admin/dashboard'),
-      headers: _headers,
+          Uri.parse('$baseUrl/admin/dashboard'),
+          headers: _headers,
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final stats = DashboardStats.fromJson(data['data']);
-      
+
       return stats;
     } else {
-      
       throw Exception('Failed to fetch dashboard stats');
     }
   }
@@ -674,8 +596,6 @@ class ApiService {
     if (!isAuthenticated) {
       throw Exception('Authentication required');
     }
-
-    
 
     final queryParams = <String, String>{
       'page': page.toString(),
@@ -694,10 +614,9 @@ class ApiService {
       final data = jsonDecode(response.body);
       final List<dynamic> orders = data['data']['orders'];
       final orderList = orders.map((json) => Order.fromJson(json)).toList();
-      
+
       return orderList;
     } else {
-      
       throw Exception('Failed to fetch admin orders');
     }
   }
@@ -707,22 +626,18 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.patch(
           Uri.parse('$baseUrl/admin/orders/$id/status'),
-      headers: _headers,
-      body: jsonEncode({'status': status}),
+          headers: _headers,
+          body: jsonEncode({'status': status}),
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final order = Order.fromJson(data['data']);
-      
-         
+
       return order;
     } else {
-      
       throw Exception('Failed to update admin order status');
     }
   }
@@ -770,8 +685,6 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/admin/customers'),
           headers: _headers,
@@ -782,10 +695,9 @@ class ApiService {
       final List<dynamic> customers = data['data']['customers'];
       final customerList =
           customers.map((json) => AdminCustomer.fromJson(json)).toList();
-      
+
       return customerList;
     } else {
-      
       throw Exception('Failed to fetch admin customers');
     }
   }
@@ -794,8 +706,6 @@ class ApiService {
     if (!isAuthenticated) {
       throw Exception('Authentication required');
     }
-
-    
 
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/admin/menu'),
@@ -807,10 +717,9 @@ class ApiService {
       final List<dynamic> items = data['data']['items'];
       final menuItems =
           items.map((json) => AdminMenuItem.fromJson(json)).toList();
-      
+
       return menuItems;
     } else {
-      
       throw Exception('Failed to fetch admin menu items');
     }
   }
@@ -820,23 +729,21 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.post(
-      Uri.parse('$baseUrl/admin/menu'),
-      headers: _headers,
+          Uri.parse('$baseUrl/admin/menu'),
+          headers: _headers,
           body: jsonEncode(menuItem.toJson()),
         ));
 
     if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
       final createdItem = AdminMenuItem.fromJson(data['data']);
-      
+
       return createdItem;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to create menu item';
-      
+
       throw Exception(message);
     }
   }
@@ -847,23 +754,21 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.put(
           Uri.parse('$baseUrl/admin/menu/$id'),
-      headers: _headers,
+          headers: _headers,
           body: jsonEncode(menuItem.toJson()),
         ));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final updatedItem = AdminMenuItem.fromJson(data['data']);
-      
+
       return updatedItem;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to update menu item';
-      
+
       throw Exception(message);
     }
   }
@@ -873,19 +778,16 @@ class ApiService {
       throw Exception('Authentication required');
     }
 
-    
-
     final response = await _makeRequest(() => http.delete(
           Uri.parse('$baseUrl/admin/menu/$id'),
-      headers: _headers,
+          headers: _headers,
         ));
 
     if (response.statusCode == 200) {
-      
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to delete menu item';
-      
+
       throw Exception(message);
     }
   }
@@ -894,8 +796,6 @@ class ApiService {
     if (!isAuthenticated) {
       throw Exception('Authentication required');
     }
-
-    
 
     final response = await _makeRequest(() => http.get(
           Uri.parse('$baseUrl/admin/payments'),
@@ -907,10 +807,9 @@ class ApiService {
       final List<dynamic> payments = data['data']['payments'];
       final paymentList =
           payments.map((json) => AdminPayment.fromJson(json)).toList();
-      
+
       return paymentList;
     } else {
-      
       throw Exception('Failed to fetch admin payments');
     }
   }
@@ -946,8 +845,6 @@ class ApiService {
 
   // Phone verification methods
   static Future<bool> sendPhoneOtp(String phoneNumber) async {
-    
-
     final response = await _makeRequest(() => http.post(
           Uri.parse('$baseUrl/auth/send-otp'),
           headers: _headers,
@@ -955,19 +852,16 @@ class ApiService {
         ));
 
     if (response.statusCode == 200) {
-      
       return true;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to send OTP';
-      
+
       throw Exception(message);
     }
   }
 
   static Future<bool> verifyPhoneOtp(String phoneNumber, String otp) async {
-    
-
     final response = await _makeRequest(() => http.post(
           Uri.parse('$baseUrl/auth/verify-otp'),
           headers: _headers,
@@ -978,12 +872,11 @@ class ApiService {
         ));
 
     if (response.statusCode == 200) {
-      
       return true;
     } else {
       final error = jsonDecode(response.body);
       final message = error['message'] ?? 'Failed to verify OTP';
-      
+
       throw Exception(message);
     }
   }
@@ -993,4 +886,3 @@ class ApiService {
     return getOrders();
   }
 }
-

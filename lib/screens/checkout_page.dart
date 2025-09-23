@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../screens/statemanagement/cart_provider.dart'; // adjust the path if needed
 
 class CheckoutPage extends StatefulWidget {
-  final List<String> cartItems;
-
-  const CheckoutPage({super.key, required this.cartItems});
+  const CheckoutPage({super.key});
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
@@ -18,11 +18,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String _selectedDelivery = 'Standard';
   int _deliveryCharge = 0;
 
-  int get totalAmount => (widget.cartItems.length * 150) + _deliveryCharge;
-  int get totalItems => widget.cartItems.length;
-
   @override
   Widget build(BuildContext context) {
+    final cart = context.watch<CartProvider>();
+
+    double totalAmount = cart.getTotal() + _deliveryCharge;
+    int totalItems = cart.items.length;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F6F4),
       appBar: AppBar(
@@ -47,29 +49,31 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     _buildCard(
                       title: "Items in Your Cart",
                       icon: Icons.shopping_cart,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: widget.cartItems.length,
-                        itemBuilder: (context, index) => Column(
-                          children: [
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: const Icon(Icons.fastfood,
-                                  color: Colors.black),
-                              title: Text(widget.cartItems[index]),
-                              trailing: const Text(
-                                'KSh 150',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                ),
+                      child: cart.items.isEmpty
+                          ? const Text("Your cart is empty")
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: cart.items.length,
+                              itemBuilder: (context, index) => Column(
+                                children: [
+                                  ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: const Icon(Icons.fastfood,
+                                        color: Colors.black),
+                                    title: Text(cart.items[index]),
+                                    trailing: Text(
+                                      'KSh ${(cart.getItemPrice(cart.items[index]) * 150).toStringAsFixed(0)}',
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                  if (index != cart.items.length - 1)
+                                    const Divider(),
+                                ],
                               ),
                             ),
-                            if (index != widget.cartItems.length - 1)
-                              const Divider(),
-                          ],
-                        ),
-                      ),
                     ),
 
                     const SizedBox(height: 20),
@@ -140,7 +144,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           RadioListTile<String>(
                             title: const Text(
                                 "Economy Delivery (KSh 200, faster)"),
-                            secondary: const Icon(Icons.bolt, color: Colors.black),
+                            secondary:
+                                const Icon(Icons.bolt, color: Colors.black),
                             value: "Economy",
                             groupValue: _selectedDelivery,
                             onChanged: (value) {
@@ -164,8 +169,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         children: [
                           RadioListTile<String>(
                             title: const Text('Cash'),
-                            secondary:
-                                const Icon(Icons.attach_money, color: Colors.black),
+                            secondary: const Icon(Icons.attach_money,
+                                color: Colors.black),
                             value: 'Cash',
                             groupValue: _selectedPayment,
                             onChanged: (value) {
@@ -177,8 +182,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           const Divider(height: 0),
                           RadioListTile<String>(
                             title: const Text('M-Pesa'),
-                            secondary:
-                                const Icon(Icons.phone_android, color: Colors.black),
+                            secondary: const Icon(Icons.phone_android,
+                                color: Colors.black),
                             value: 'M-Pesa',
                             groupValue: _selectedPayment,
                             onChanged: (value) {
@@ -187,7 +192,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               });
                             },
                           ),
-                          // Show phone number input only if M-Pesa is selected
                           if (_selectedPayment == 'M-Pesa')
                             Padding(
                               padding: const EdgeInsets.only(top: 12),
@@ -199,8 +203,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  prefixIcon:
-                                      const Icon(Icons.phone_android, color: Colors.black),
+                                  prefixIcon: const Icon(Icons.phone_android,
+                                      color: Colors.black),
                                 ),
                               ),
                             ),
@@ -250,7 +254,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             children: [
                               const Text("Total Amount"),
                               Text(
-                                "KSh $totalAmount",
+                                "KSh ${totalAmount.toStringAsFixed(0)}",
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFF6D4C41),
@@ -296,6 +300,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         ? 'M-Pesa Number: ${_mpesaController.text}'
                         : 'Cash';
 
+                    // Show confirmation
                     showDialog(
                       context: context,
                       builder: (_) => AlertDialog(
@@ -313,13 +318,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           'Payment Method: $paymentInfo\n'
                           'Delivery Option: $_selectedDelivery\n'
                           'Products Ordered: $totalItems\n'
-                          'Total: KSh $totalAmount\n'
+                          'Total: KSh ${totalAmount.toStringAsFixed(0)}\n'
                           'Allergies: $allergyNote\n'
                           'Cutlery: $cutleryNote',
                         ),
                         actions: [
                           TextButton(
-                            onPressed: () => Navigator.pop(context),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              // clear the cart using provider
+                              context.read<CartProvider>().clearCart();
+                              Navigator.pop(context, true);
+                            },
                             child: const Text('OK'),
                           ),
                         ],
