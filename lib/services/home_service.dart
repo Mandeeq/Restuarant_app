@@ -4,7 +4,7 @@ import '../models/home_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class HomeService {
-  static final baseUrl = "${dotenv.env['baseUrl'] ?? ""}/api";
+  static final baseUrl = "${dotenv.env['baseUrl'] ?? ""}/api/home";
 
   Future<List<FeaturedItem>> fetchFeaturedItems() async {
     final response = await http.get(Uri.parse("$baseUrl/featured"));

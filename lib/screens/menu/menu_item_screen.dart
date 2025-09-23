@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import '../../models/menu_item_model.dart';
 import '../../theme.dart';
-import '../../services/api_service.dart';
 
 class MenuItemScreen extends StatelessWidget {
   final MenuItem menuItem;
@@ -19,7 +18,7 @@ class MenuItemScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: backgroundColor,
       body: CustomScrollView(
         slivers: [
           // Hero App Bar with Image
@@ -38,7 +37,8 @@ class MenuItemScreen extends StatelessWidget {
                       menuItem.imageUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
-                        print('❌ Image loading error for ${menuItem.name}: $error');
+                        print(
+                            '❌ Image loading error for ${menuItem.name}: $error');
                         print('❌ Image URL: ${menuItem.imageUrl}');
                         return Container(
                           color: Colors.grey[300],
@@ -62,7 +62,8 @@ class MenuItemScreen extends StatelessWidget {
                                   ? loadingProgress.cumulativeBytesLoaded /
                                       loadingProgress.expectedTotalBytes!
                                   : null,
-                              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(primaryColor),
                             ),
                           ),
                         );
@@ -113,7 +114,7 @@ class MenuItemScreen extends StatelessWidget {
               ),
             ],
           ),
-          
+
           // Content Section
           SliverToBoxAdapter(
             child: Padding(
@@ -141,13 +142,16 @@ class MenuItemScreen extends StatelessWidget {
                         // Title
                         Text(
                           menuItem.name,
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                            color: titleColor,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .headlineMedium
+                              ?.copyWith(
+                                color: titleColor,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         const SizedBox(height: 8),
-                        
+
                         // Category and Price Row
                         Row(
                           children: [
@@ -171,20 +175,23 @@ class MenuItemScreen extends StatelessWidget {
                             ),
                             const Spacer(),
                             Text(
-                              "\$${menuItem.price.toStringAsFixed(2)}",
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: primaryColor,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              "\Ksh ${menuItem.price.toStringAsFixed(2)}",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(
+                                    color: primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                             ),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: defaultPadding),
-                  
+
                   // Description Section
                   Container(
                     padding: const EdgeInsets.all(defaultPadding),
@@ -204,10 +211,11 @@ class MenuItemScreen extends StatelessWidget {
                       children: [
                         Text(
                           "Description",
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: titleColor,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    color: titleColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                         ),
                         const SizedBox(height: 12),
                         Text(
@@ -223,9 +231,9 @@ class MenuItemScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: defaultPadding),
-                  
+
                   // Dietary Tags Section (if available)
                   if (menuItem.dietaryTags.isNotEmpty) ...[
                     Container(
@@ -246,10 +254,13 @@ class MenuItemScreen extends StatelessWidget {
                         children: [
                           Text(
                             "Dietary Information",
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: titleColor,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  color: titleColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                           const SizedBox(height: 12),
                           Wrap(
@@ -285,7 +296,7 @@ class MenuItemScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: defaultPadding),
                   ],
-                  
+
                   // Preparation Time Section
                   Container(
                     padding: const EdgeInsets.all(defaultPadding),
@@ -338,9 +349,9 @@ class MenuItemScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: defaultPadding * 2),
-                  
+
                   // Add to Cart Button
                   SizedBox(
                     width: double.infinity,
@@ -389,7 +400,7 @@ class MenuItemScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   const SizedBox(height: defaultPadding),
                 ],
               ),

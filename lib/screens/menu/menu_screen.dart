@@ -85,7 +85,8 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget buildCategoryChip(BuildContext context, String category, bool isSelected) {
+    Widget buildCategoryChip(
+        BuildContext context, String category, bool isSelected) {
       return Padding(
         padding: const EdgeInsets.only(right: 8),
         child: ChoiceChip(
@@ -105,7 +106,8 @@ class _MenuScreenState extends State<MenuScreen> {
                 : Theme.of(context).colorScheme.primary,
             fontWeight: FontWeight.bold,
           ),
-          backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          backgroundColor:
+              Theme.of(context).colorScheme.primary.withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -193,7 +195,6 @@ class _MenuScreenState extends State<MenuScreen> {
     return ListView.builder(
       padding: const EdgeInsets.all(defaultPadding),
       itemCount: _menuItems.length,
-
       itemBuilder: (context, index) {
         final item = _menuItems[index];
         return Container(
@@ -201,8 +202,10 @@ class _MenuScreenState extends State<MenuScreen> {
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: Colors.grey.shade400, width: 1),
             ),
-            elevation: 1,
+            elevation: 0.3,
+            color: Colors.grey[100],
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: () {
@@ -222,8 +225,8 @@ class _MenuScreenState extends State<MenuScreen> {
                 children: [
                   // Food Image
                   Container(
-                    width: 120,
-                    height: 120,
+                    width: 130,
+                    height: 135,
                     child: ClipRRect(
                       child: Image.network(
                         item.imageUrl,
@@ -231,7 +234,8 @@ class _MenuScreenState extends State<MenuScreen> {
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             color: Colors.grey[200],
-                            child: const Icon(Icons.fastfood, size: 40, color: Colors.grey),
+                            child: const Icon(Icons.fastfood,
+                                size: 40, color: Colors.grey),
                           );
                         },
                         loadingBuilder: (context, child, loadingProgress) {
@@ -240,9 +244,10 @@ class _MenuScreenState extends State<MenuScreen> {
                             color: Colors.grey[200],
                             child: Center(
                               child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes != null
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
                                     ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
+                                        loadingProgress.expectedTotalBytes!
                                     : null,
                               ),
                             ),
@@ -298,7 +303,8 @@ class _MenuScreenState extends State<MenuScreen> {
                           // Description
                           // Description with fixed min height for 3 lines
                           Container(
-                            constraints: BoxConstraints(minHeight: 36), // Minimum height for 3 lines
+                            constraints: BoxConstraints(
+                                minHeight: 36), // Minimum height for 3 lines
                             child: Text(
                               item.description,
                               style: TextStyle(
@@ -332,15 +338,16 @@ class _MenuScreenState extends State<MenuScreen> {
                                   widget.onAddToCart(item.name);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Added ${item.name} to cart'),
+                                      content:
+                                          Text('Added ${item.name} to cart'),
                                       action: SnackBarAction(
                                         label: 'View Cart',
                                         onPressed: () {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) =>
-                                                  CartPage(cartItems: widget.cartItems),
+                                              builder: (context) => CartPage(
+                                                  cartItems: widget.cartItems),
                                             ),
                                           );
                                         },

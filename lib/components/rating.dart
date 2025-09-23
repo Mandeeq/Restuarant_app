@@ -10,6 +10,12 @@ class Rating extends StatelessWidget {
 
   final double rating;
 
+  String? get userName => null;
+
+  get comment => null;
+
+  DateTime? get date => null;
+
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -53,23 +53,30 @@ class HomeScreen extends StatelessWidget {
                         children: [
                           Text(
                             'Qaffee Point',
-                            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 42,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineLarge
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 42,
+                                ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Everyone\'s Living Room',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: Colors.white70,
-                              fontWeight: FontWeight.w500,
-                            ),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(
+                                  color: Colors.white70,
+                                  fontWeight: FontWeight.w500,
+                                ),
                           ),
                           const SizedBox(height: 24),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
                             decoration: BoxDecoration(
                               color: primaryColor,
                               borderRadius: BorderRadius.circular(16),
@@ -77,14 +84,18 @@ class HomeScreen extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.location_on, color: Colors.white, size: 18),
+                                const Icon(Icons.location_on,
+                                    color: Colors.white, size: 18),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Mombasa • Now Open',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                 ),
                               ],
                             ),
@@ -126,7 +137,9 @@ class HomeScreen extends StatelessWidget {
                     return const Text("No featured items available");
                   }
                   return Column(
-                    children: snapshot.data!.map((item) => _buildFeaturedCard(context, item)).toList(),
+                    children: snapshot.data!
+                        .map((item) => _buildFeaturedCard(context, item))
+                        .toList(),
                   );
                 },
               ),
@@ -144,7 +157,9 @@ class HomeScreen extends StatelessWidget {
                     return const Text("No offers available");
                   }
                   return Column(
-                    children: snapshot.data!.map((offer) => _buildOfferCard(context, offer)).toList(),
+                    children: snapshot.data!
+                        .map((offer) => _buildOfferCard(context, offer))
+                        .toList(),
                   );
                 },
               ),
@@ -165,7 +180,9 @@ class HomeScreen extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: Row(
-                      children: snapshot.data!.map((item) => _buildPopularCard(context, item)).toList(),
+                      children: snapshot.data!
+                          .map((item) => _buildPopularCard(context, item))
+                          .toList(),
                     ),
                   );
                 },
@@ -184,7 +201,9 @@ class HomeScreen extends StatelessWidget {
                     return const Text("No testimonials available");
                   }
                   return Column(
-                    children: snapshot.data!.map((t) => _buildTestimonialCard(context, t)).toList(),
+                    children: snapshot.data!
+                        .map((t) => _buildTestimonialCard(context, t))
+                        .toList(),
                   );
                 },
               ),
@@ -194,9 +213,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-
-      // 🔹 Bottom Order Button
-    //  bottomNavigationBar: _buildBottomOrderButton(context),
     );
   }
 
@@ -222,10 +238,20 @@ class HomeScreen extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _buildActionCard(context, icon: Icons.coffee, label: "Coffee", color: const Color(0xFF6F4E37)),
-          _buildActionCard(context, icon: Icons.breakfast_dining, label: "Breakfast", color: const Color(0xFFFF9F1C)),
-          _buildActionCard(context, icon: Icons.cake, label: "Pastries", color: const Color(0xFFFF6B6B)),
-          _buildActionCard(context, icon: Icons.local_drink, label: "Specialty", color: primaryColor),
+          _buildActionCard(context,
+              icon: Icons.coffee,
+              label: "Coffee",
+              color: const Color(0xFF6F4E37)),
+          _buildActionCard(context,
+              icon: Icons.breakfast_dining,
+              label: "Breakfast",
+              color: const Color(0xFFFF9F1C)),
+          _buildActionCard(context,
+              icon: Icons.cake,
+              label: "Pastries",
+              color: const Color(0xFFFF6B6B)),
+          _buildActionCard(context,
+              icon: Icons.local_drink, label: "Specialty", color: primaryColor),
         ],
       ),
     );
@@ -233,13 +259,15 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildFeaturedCard(BuildContext context, FeaturedItem item) {
     return GestureDetector(
-      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderDetailsScreen())),
+      onTap: () => Navigator.push(context,
+          MaterialPageRoute(builder: (_) => const OrderDetailsScreen())),
       child: Container(
         height: 180,
         margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          image: DecorationImage(image: NetworkImage(item.imageUrl), fit: BoxFit.cover),
+          image: DecorationImage(
+              image: NetworkImage(item.imageUrl), fit: BoxFit.cover),
         ),
         child: Container(
           decoration: BoxDecoration(
@@ -255,9 +283,17 @@ class HomeScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(item.title, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
-              Text(item.subtitle, style: const TextStyle(color: Colors.white70, fontSize: 14)),
-              Text("Ksh. ${item.price}", style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+              Text(item.title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
+              Text(item.subtitle,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.copyWith(color: Colors.white70)),
+              Text("Ksh. ${item.price}",
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Colors.white, fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -271,7 +307,10 @@ class HomeScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(colors: [primaryColor.withOpacity(0.9), primaryColor.withOpacity(0.7)]),
+        gradient: LinearGradient(colors: [
+          primaryColor.withOpacity(0.9),
+          primaryColor.withOpacity(0.7)
+        ]),
       ),
       child: Row(
         children: [
@@ -279,16 +318,23 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(offer.title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(offer.title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
-                Text(offer.description, style: const TextStyle(color: Colors.white70)),
+                Text(offer.description,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: Colors.white70)),
               ],
             ),
           ),
           const SizedBox(width: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: Image.network(offer.imageUrl, width: 80, height: 80, fit: BoxFit.cover),
+            child: Image.network(offer.imageUrl,
+                width: 80, height: 80, fit: BoxFit.cover),
           ),
         ],
       ),
@@ -296,29 +342,42 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildPopularCard(BuildContext context, PopularItem item) {
+    double cardWidth = MediaQuery.of(context).size.width * 0.4; // 40% of screen
+
     return Container(
-      width: 140,
+      width: cardWidth,
       margin: const EdgeInsets.only(right: 16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8)],
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8)
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.network(item.imageUrl, height: 100, width: 140, fit: BoxFit.cover),
+            child: Image.network(item.imageUrl,
+                height: 100, width: 140, fit: BoxFit.cover),
           ),
           Padding(
             padding: const EdgeInsets.all(8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(item.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+                Text(item.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 4),
-                Text("Ksh. ${item.price}", style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                Text("Ksh. ${item.price}",
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: primaryColor, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
@@ -334,22 +393,32 @@ class HomeScreen extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)],
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("⭐" * t.rating, style: const TextStyle(color: Colors.amber, fontSize: 16)),
+          Text("⭐" * t.rating,
+              style: const TextStyle(color: Colors.amber, fontSize: 16)),
           const SizedBox(height: 6),
-          Text(t.comment, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+          Text(t.comment,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: Colors.black87)),
           const SizedBox(height: 6),
-          Text("- ${t.user}", style: const TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.black54)),
+          Text("- ${t.user}",
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  fontStyle: FontStyle.italic, color: Colors.black54)),
         ],
       ),
     );
   }
 
-  Widget _buildActionCard(BuildContext context, {required IconData icon, required String label, required Color color}) {
+  Widget _buildActionCard(BuildContext context,
+      {required IconData icon, required String label, required Color color}) {
     return Column(
       children: [
         Container(
@@ -362,30 +431,12 @@ class HomeScreen extends StatelessWidget {
           child: Icon(icon, color: color, size: 32),
         ),
         const SizedBox(height: 8),
-        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+        Text(label,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(fontWeight: FontWeight.w600)),
       ],
     );
   }
-
-  // Widget _buildBottomOrderButton(BuildContext context) {
-  //   return Container(
-  //     height: 90,
-  //     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-  //     child: ElevatedButton(
-  //       style: ElevatedButton.styleFrom(
-  //         backgroundColor: primaryColor,
-  //         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-  //       ),
-  //       onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const OrderDetailsScreen())),
-  //       child: const Row(
-  //         mainAxisAlignment: MainAxisAlignment.center,
-  //         children: [
-  //           Icon(Icons.menu_book_outlined, size: 24, color: Colors.white),
-  //           SizedBox(width: 12),
-  //           Text("VIEW FULL MENU", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }

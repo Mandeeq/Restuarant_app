@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../theme.dart';
 import '../../models/admin_models.dart';
 import '../../services/api_service.dart';
+import '../../services/image_upload_service.dart';
 
 class AdminMenuScreen extends StatefulWidget {
   const AdminMenuScreen({super.key});
@@ -16,9 +19,10 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
   bool _isLoading = true;
   String _searchQuery = '';
   String _selectedCategory = 'all';
-  
+
   final TextEditingController _searchController = TextEditingController();
-  
+  final ImagePicker _imagePicker = ImagePicker();
+
   final List<String> _categories = [
     'all',
     'starter',
@@ -70,21 +74,76 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
         final description = item.description.toLowerCase();
         final category = item.category.toLowerCase();
         final query = _searchQuery.toLowerCase();
-        
+
         return name.contains(query) ||
-               description.contains(query) ||
-               category.contains(query);
+            description.contains(query) ||
+            category.contains(query);
       }).toList();
     }
 
     // Apply category filter
     if (_selectedCategory != 'all') {
-      filtered = filtered.where((item) => item.category == _selectedCategory).toList();
+      filtered =
+          filtered.where((item) => item.category == _selectedCategory).toList();
     }
 
     setState(() {
       _filteredMenuItems = filtered;
     });
+  }
+
+  // Function to pick images
+  Future<List<String>> _pickImages() async {
+    final List<XFile> pickedFiles = await _imagePicker.pickMultiImage(
+      maxWidth: 1200,
+      maxHeight: 1200,
+      imageQuality: 80,
+    );
+
+    if (pickedFiles.isEmpty) return [];
+
+    // Upload images and get URLs
+    final List<String> imageUrls = [];
+    for (final file in pickedFiles) {
+      try {
+        final imageUrl = await ImageUploadService.uploadImage(File(file.path));
+        imageUrls.add(imageUrl);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to upload image: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+
+    return imageUrls;
+  }
+
+  // Function to take a photo
+  Future<List<String>> _takePhoto() async {
+    final XFile? photo = await _imagePicker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1200,
+      maxHeight: 1200,
+      imageQuality: 80,
+    );
+
+    if (photo == null) return [];
+
+    try {
+      final imageUrl = await ImageUploadService.uploadImage(File(photo.path));
+      return [imageUrl];
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to upload photo: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return [];
+    }
   }
 
   @override
@@ -158,7 +217,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                   },
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Category Filter
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -175,7 +234,9 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                         return DropdownMenuItem<String>(
                           value: category,
                           child: Text(
-                            category == 'all' ? 'All Categories' : category.toUpperCase(),
+                            category == 'all'
+                                ? 'All Categories'
+                                : category.toUpperCase(),
                             style: TextStyle(
                               color: Colors.grey[600],
                               fontWeight: FontWeight.w500,
@@ -195,10 +256,11 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
               ],
             ),
           ),
-          
+
           // Stats Cards
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+                horizontal: defaultPadding, vertical: 8),
             child: Row(
               children: [
                 Expanded(
@@ -213,7 +275,10 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                 Expanded(
                   child: _buildStatCard(
                     'Available',
-                    _filteredMenuItems.where((item) => item.isAvailable).length.toString(),
+                    _filteredMenuItems
+                        .where((item) => item.isAvailable)
+                        .length
+                        .toString(),
                     Icons.check_circle,
                     Colors.green,
                   ),
@@ -222,7 +287,10 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                 Expanded(
                   child: _buildStatCard(
                     'Featured',
-                    _filteredMenuItems.where((item) => item.isFeatured).length.toString(),
+                    _filteredMenuItems
+                        .where((item) => item.isFeatured)
+                        .length
+                        .toString(),
                     Icons.star,
                     Colors.orange,
                   ),
@@ -230,7 +298,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
               ],
             ),
           ),
-          
+
           // Menu Items List
           Expanded(
             child: _isLoading
@@ -251,7 +319,8 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -343,6 +412,25 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Image preview (show first image if available)
+              if (item.imageUrl.isNotEmpty && item.imageUrl.isNotEmpty)
+                Column(
+                  children: [
+                    Container(
+                      height: 120,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        image: DecorationImage(
+                          image: NetworkImage(item.imageUrl),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
+
               // Header Row
               Row(
                 children: [
@@ -384,12 +472,15 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                       ),
                       const SizedBox(height: 4),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: _getCategoryColor(item.category).withOpacity(0.1),
+                          color:
+                              _getCategoryColor(item.category).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: _getCategoryColor(item.category).withOpacity(0.3),
+                            color: _getCategoryColor(item.category)
+                                .withOpacity(0.3),
                           ),
                         ),
                         child: Text(
@@ -405,9 +496,9 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Item Details
               Row(
                 children: [
@@ -439,7 +530,27 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                   ),
                 ],
               ),
-              
+
+              // Image count badge
+              if (item.imageUrl.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    children: [
+                      Icon(Icons.photo_library,
+                          size: 16, color: Colors.grey[600]),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${item.imageUrl.length} image(s)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
               // Dietary Tags
               if (item.dietaryTags.isNotEmpty) ...[
                 const SizedBox(height: 12),
@@ -448,7 +559,8 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                   runSpacing: 4,
                   children: item.dietaryTags.map((tag) {
                     return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.purple.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
@@ -468,7 +580,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                   }).toList(),
                 ),
               ],
-              
+
               // Action Buttons
               const SizedBox(height: 12),
               Row(
@@ -511,7 +623,8 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     );
   }
 
-  Widget _buildItemDetail(String label, String value, IconData icon, Color color) {
+  Widget _buildItemDetail(
+      String label, String value, IconData icon, Color color) {
     return Row(
       children: [
         Icon(icon, size: 16, color: color),
@@ -567,6 +680,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     bool isAvailable = true;
     bool isFeatured = false;
     int preparationTime = 15;
+    String selectedImageUrl = '';
 
     showModalBottomSheet(
       context: context,
@@ -581,6 +695,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
         isAvailable: isAvailable,
         isFeatured: isFeatured,
         preparationTime: preparationTime,
+        imageUrl: selectedImageUrl,
         onSave: () async {
           try {
             final item = AdminMenuItem(
@@ -590,7 +705,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
               price: double.tryParse(priceController.text) ?? 0,
               category: selectedCategory,
               dietaryTags: [],
-              imageUrl: 'food.jpg',
+              imageUrl: selectedImageUrl,
               isFeatured: isFeatured,
               isAvailable: isAvailable,
               preparationTime: preparationTime,
@@ -627,6 +742,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     bool isAvailable = item.isAvailable;
     bool isFeatured = item.isFeatured;
     int preparationTime = item.preparationTime;
+    List<String> selectedImageUrls = List.from(item.imageUrl as Iterable);
 
     showModalBottomSheet(
       context: context,
@@ -641,6 +757,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
         isAvailable: isAvailable,
         isFeatured: isFeatured,
         preparationTime: preparationTime,
+        imageUrl: selectedImageUrl,
         onSave: () async {
           try {
             final updatedItem = AdminMenuItem(
@@ -650,7 +767,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
               price: double.tryParse(priceController.text) ?? 0,
               category: selectedCategory,
               dietaryTags: item.dietaryTags,
-              imageUrl: item.imageUrl,
+              imageUrl: selectedImageUrl,
               isFeatured: isFeatured,
               isAvailable: isAvailable,
               preparationTime: preparationTime,
@@ -688,6 +805,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     required bool isAvailable,
     required bool isFeatured,
     required int preparationTime,
+    required String imageUrl, // single image
     required VoidCallback onSave,
   }) {
     return StatefulBuilder(
@@ -710,7 +828,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              
+
               // Header
               Padding(
                 padding: const EdgeInsets.all(16),
@@ -732,15 +850,123 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                   ],
                 ),
               ),
-              
+
               const Divider(),
-              
+
               // Form
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
+                      // Image Upload Section
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Menu Image (Only 1)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+
+                          // Current Image Preview
+                          if (imageUrl.isNotEmpty)
+                            Stack(
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  height: 160,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    image: DecorationImage(
+                                      image: NetworkImage(imageUrl),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 8,
+                                  right: 8,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        imageUrl = '';
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.red,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.close,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                          // Upload Buttons (if no image yet)
+                          if (imageUrl.isEmpty)
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () async {
+                                      final picked =
+                                          await _imagePicker.pickImage(
+                                        source: ImageSource.gallery,
+                                        maxWidth: 1200,
+                                        maxHeight: 1200,
+                                        imageQuality: 80,
+                                      );
+                                      if (picked != null) {
+                                        final url = await ImageUploadService
+                                            .uploadImage(File(picked.path));
+                                        setState(() => imageUrl = url);
+                                      }
+                                    },
+                                    icon: const Icon(Icons.photo_library),
+                                    label: const Text('Choose from Gallery'),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: OutlinedButton.icon(
+                                    onPressed: () async {
+                                      final photo =
+                                          await _imagePicker.pickImage(
+                                        source: ImageSource.camera,
+                                        maxWidth: 1200,
+                                        maxHeight: 1200,
+                                        imageQuality: 80,
+                                      );
+                                      if (photo != null) {
+                                        final url = await ImageUploadService
+                                            .uploadImage(File(photo.path));
+                                        setState(() => imageUrl = url);
+                                      }
+                                    },
+                                    icon: const Icon(Icons.camera_alt),
+                                    label: const Text('Take Photo'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+                      const Divider(),
+                      const SizedBox(height: 16),
+
                       TextField(
                         controller: nameController,
                         decoration: const InputDecoration(
@@ -843,7 +1069,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                   ),
                 ),
               ),
-              
+
               // Save Button
               Padding(
                 padding: const EdgeInsets.all(16),
@@ -916,3 +1142,5 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     );
   }
 }
+
+String selectedImageUrl = '';

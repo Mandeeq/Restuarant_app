@@ -17,9 +17,9 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   String _selectedStatus = 'all';
   String _searchQuery = '';
   String _selectedTimeFilter = 'all';
-  
+
   final TextEditingController _searchController = TextEditingController();
-  
+
   final List<String> _statusOptions = [
     'all',
     'pending',
@@ -29,7 +29,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     'delivered',
     'cancelled',
   ];
-  
+
   final List<String> _timeFilters = [
     'all',
     'today',
@@ -78,7 +78,9 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
 
     // Apply status filter
     if (_selectedStatus != 'all') {
-      filtered = filtered.where((order) => order.orderStatus == _selectedStatus).toList();
+      filtered = filtered
+          .where((order) => order.orderStatus == _selectedStatus)
+          .toList();
     }
 
     // Apply time filter
@@ -88,8 +90,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         filtered = filtered.where((order) {
           final orderDate = order.createdAt ?? DateTime.now();
           return orderDate.year == now.year &&
-                 orderDate.month == now.month &&
-                 orderDate.day == now.day;
+              orderDate.month == now.month &&
+              orderDate.day == now.day;
         }).toList();
         break;
       case 'yesterday':
@@ -97,8 +99,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         filtered = filtered.where((order) {
           final orderDate = order.createdAt ?? DateTime.now();
           return orderDate.year == yesterday.year &&
-                 orderDate.month == yesterday.month &&
-                 orderDate.day == yesterday.day;
+              orderDate.month == yesterday.month &&
+              orderDate.day == yesterday.day;
         }).toList();
         break;
       case 'this-week':
@@ -123,10 +125,10 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         final customerName = order.user?.name.toLowerCase() ?? '';
         final customerPhone = order.user?.phone.toLowerCase() ?? '';
         final query = _searchQuery.toLowerCase();
-        
+
         return orderId.contains(query) ||
-               customerName.contains(query) ||
-               customerPhone.contains(query);
+            customerName.contains(query) ||
+            customerPhone.contains(query);
       }).toList();
     }
 
@@ -201,7 +203,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   },
                 ),
                 const SizedBox(height: 12),
-                
+
                 // Filter Row
                 Row(
                   children: [
@@ -222,9 +224,13 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                               return DropdownMenuItem<String>(
                                 value: status,
                                 child: Text(
-                                  status == 'all' ? 'All Status' : status.toUpperCase(),
+                                  status == 'all'
+                                      ? 'All Status'
+                                      : status.toUpperCase(),
                                   style: TextStyle(
-                                    color: status == 'all' ? Colors.grey[600] : _getStatusColor(status),
+                                    color: status == 'all'
+                                        ? Colors.grey[600]
+                                        : _getStatusColor(status),
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
@@ -241,7 +247,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    
+
                     // Time Filter
                     Expanded(
                       child: Container(
@@ -282,10 +288,11 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               ],
             ),
           ),
-          
+
           // Stats Cards
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: defaultPadding, vertical: 8),
+            padding: const EdgeInsets.symmetric(
+                horizontal: defaultPadding, vertical: 8),
             child: Row(
               children: [
                 Expanded(
@@ -300,7 +307,10 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                 Expanded(
                   child: _buildStatCard(
                     'Pending',
-                    _filteredOrders.where((o) => o.orderStatus == 'pending').length.toString(),
+                    _filteredOrders
+                        .where((o) => o.orderStatus == 'pending')
+                        .length
+                        .toString(),
                     Icons.pending,
                     Colors.orange,
                   ),
@@ -309,7 +319,10 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                 Expanded(
                   child: _buildStatCard(
                     'Delivered',
-                    _filteredOrders.where((o) => o.orderStatus == 'delivered').length.toString(),
+                    _filteredOrders
+                        .where((o) => o.orderStatus == 'delivered')
+                        .length
+                        .toString(),
                     Icons.check_circle,
                     Colors.green,
                   ),
@@ -317,7 +330,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               ],
             ),
           ),
-          
+
           // Orders List
           Expanded(
             child: _isLoading
@@ -338,7 +351,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -456,12 +470,15 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: _getStatusColor(order.orderStatus).withOpacity(0.1),
+                      color:
+                          _getStatusColor(order.orderStatus).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: _getStatusColor(order.orderStatus).withOpacity(0.3),
+                        color:
+                            _getStatusColor(order.orderStatus).withOpacity(0.3),
                       ),
                     ),
                     child: Text(
@@ -475,9 +492,9 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 12),
-              
+
               // Customer Info
               if (order.user != null) ...[
                 Row(
@@ -505,7 +522,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                 ),
                 const SizedBox(height: 8),
               ],
-              
+
               // Order Summary
               Row(
                 children: [
@@ -526,14 +543,15 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 8),
-              
+
               // Service Type & Payment
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.blue.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
@@ -549,9 +567,11 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: _getPaymentStatusColor(order.paymentStatus).withOpacity(0.1),
+                      color: _getPaymentStatusColor(order.paymentStatus)
+                          .withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -574,19 +594,25 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
 
   String _getTimeFilterLabel(String filter) {
     switch (filter) {
-      case 'all': return 'All Time';
-      case 'today': return 'Today';
-      case 'yesterday': return 'Yesterday';
-      case 'this-week': return 'This Week';
-      case 'this-month': return 'This Month';
-      default: return 'All Time';
+      case 'all':
+        return 'All Time';
+      case 'today':
+        return 'Today';
+      case 'yesterday':
+        return 'Yesterday';
+      case 'this-week':
+        return 'This Week';
+      case 'this-month':
+        return 'This Month';
+      default:
+        return 'All Time';
     }
   }
 
   String _formatDateTime(DateTime dateTime) {
     final now = DateTime.now();
     final difference = now.difference(dateTime);
-    
+
     if (difference.inDays > 0) {
       return '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
     } else if (difference.inHours > 0) {
@@ -682,7 +708,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          
+
           // Header
           Padding(
             padding: const EdgeInsets.all(16),
@@ -710,12 +736,14 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: _getStatusColor(order.orderStatus).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: _getStatusColor(order.orderStatus).withOpacity(0.3),
+                      color:
+                          _getStatusColor(order.orderStatus).withOpacity(0.3),
                     ),
                   ),
                   child: Text(
@@ -729,9 +757,9 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               ],
             ),
           ),
-          
+
           const Divider(),
-          
+
           // Content
           Expanded(
             child: SingleChildScrollView(
@@ -752,107 +780,124 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                         const Text('No customer details available'),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Order Details
                   _buildDetailSection(
                     'Order Details',
                     Icons.receipt_long,
                     [
-                      _buildDetailRow('Total Amount', '\$${order.totalAmount.toStringAsFixed(2)}'),
-                      _buildDetailRow('Service Type', order.serviceType.toUpperCase()),
-                      _buildDetailRow('Payment Method', order.paymentMethod.toUpperCase()),
-                      _buildDetailRow('Payment Status', order.paymentStatus.toUpperCase()),
+                      _buildDetailRow('Total Amount',
+                          '\$${order.totalAmount.toStringAsFixed(2)}'),
+                      _buildDetailRow(
+                          'Service Type', order.serviceType.toUpperCase()),
+                      _buildDetailRow(
+                          'Payment Method', order.paymentMethod.toUpperCase()),
+                      _buildDetailRow(
+                          'Payment Status', order.paymentStatus.toUpperCase()),
                       if (order.deliveryFee > 0)
-                        _buildDetailRow('Delivery Fee', '\$${order.deliveryFee.toStringAsFixed(2)}'),
+                        _buildDetailRow('Delivery Fee',
+                            '\$${order.deliveryFee.toStringAsFixed(2)}'),
                       if (order.discountApplied > 0)
-                        _buildDetailRow('Discount', '\$${order.discountApplied.toStringAsFixed(2)}'),
+                        _buildDetailRow('Discount',
+                            '\$${order.discountApplied.toStringAsFixed(2)}'),
                     ],
                   ),
-                  
+
                   // Delivery Address
-                  if (order.serviceType == 'delivery' && order.deliveryAddress != null) ...[
+                  if (order.serviceType == 'delivery' &&
+                      order.deliveryAddress != null) ...[
                     const SizedBox(height: 20),
                     _buildDetailSection(
                       'Delivery Address',
                       Icons.location_on,
                       [
-                        _buildDetailRow('Street', order.deliveryAddress!.street),
+                        _buildDetailRow(
+                            'Street', order.deliveryAddress!.street),
                         _buildDetailRow('City', order.deliveryAddress!.city),
                       ],
                     ),
                   ],
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Order Items
                   _buildDetailSection(
                     'Order Items',
                     Icons.shopping_bag,
-                    order.items.map((item) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: Text(
-                              '${item.quantity}x ${item.name}',
-                              style: const TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                          Expanded(
-                            child: Text(
-                              '\$${(item.price * item.quantity).toStringAsFixed(2)}',
-                              textAlign: TextAlign.right,
-                              style: const TextStyle(fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )).toList(),
+                    order.items
+                        .map((item) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 2,
+                                    child: Text(
+                                      '${item.quantity}x ${item.name}',
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Text(
+                                      '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                                      textAlign: TextAlign.right,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ))
+                        .toList(),
                   ),
-                  
+
                   // Special Instructions
-                  if (order.items.any((item) => item.specialInstructions?.isNotEmpty == true)) ...[
+                  if (order.items.any((item) =>
+                      item.specialInstructions?.isNotEmpty == true)) ...[
                     const SizedBox(height: 20),
                     _buildDetailSection(
                       'Special Instructions',
                       Icons.note,
                       order.items
-                          .where((item) => item.specialInstructions?.isNotEmpty == true)
+                          .where((item) =>
+                              item.specialInstructions?.isNotEmpty == true)
                           .map((item) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.name,
-                                  style: const TextStyle(fontWeight: FontWeight.w500),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 4),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    Text(
+                                      item.specialInstructions!,
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  item.specialInstructions!,
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontStyle: FontStyle.italic,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ))
+                              ))
                           .toList(),
                     ),
                   ],
-                  
+
                   const SizedBox(height: 20),
-                  
+
                   // Status Update
                   _buildDetailSection(
                     'Update Status',
                     Icons.update,
                     [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
                           color: Colors.grey[100],
                           borderRadius: BorderRadius.circular(8),
@@ -883,7 +928,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                               );
                             }).toList(),
                             onChanged: (newStatus) {
-                              if (newStatus != null && newStatus != order.orderStatus) {
+                              if (newStatus != null &&
+                                  newStatus != order.orderStatus) {
                                 Navigator.pop(context);
                                 _updateOrderStatus(order, newStatus);
                               }
@@ -893,7 +939,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       ),
                     ],
                   ),
-                  
+
                   const SizedBox(height: 20),
                 ],
               ),
@@ -904,7 +950,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     );
   }
 
-  Widget _buildDetailSection(String title, IconData icon, List<Widget> children) {
+  Widget _buildDetailSection(
+      String title, IconData icon, List<Widget> children) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
