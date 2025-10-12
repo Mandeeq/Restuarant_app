@@ -1,11 +1,28 @@
 import 'package:flutter/material.dart';
 import '../../theme.dart';
-import '../orderDetails/order_details_screen.dart';
+// order_details import removed: navigation goes to specific category detail screens
+import 'featured/featured_item_screen.dart';
+import 'offers/offer_item_screen.dart';
+import 'popular/popular_item_screen.dart';
 import '../../services/home_service.dart';
+import '../../services/api_service.dart';
+import '../menu/menu_item_screen.dart';
 import '../../models/home_model.dart';
+import '../../utils/image_utils.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  // Helper to convert a relative/possibly-empty image path to an ImageProvider.
+  // Uses NetworkImage when the constructed URL looks valid, otherwise falls back
+  // to a bundled placeholder asset to avoid passing invalid URLs to NetworkImage.
+  ImageProvider _imageProvider(String? imagePath) {
+    final url = ImageUtils.getImageUrl(imagePath);
+    if (url.isNotEmpty && ImageUtils.isValidImageUrl(url)) {
+      return NetworkImage(url);
+    }
+    return const AssetImage('assets/images/placeholder.png');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -259,15 +276,36 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildFeaturedCard(BuildContext context, FeaturedItem item) {
     return GestureDetector(
-      onTap: () => Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const OrderDetailsScreen())),
-      child: Container(
+      onTap: () async {
+        // If the featured item references a menu item id, open the menu detail
+        if (item.id.isNotEmpty) {
+          try {
+            final menuItem = await ApiService.getMenuItem(item.id);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => MenuItemScreen(menuItem: menuItem),
+              ),
+            );
+            return;
+          } catch (_) {
+            // ignore and open the featured screen fallback
+          }
+        }
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => FeaturedItemScreen(item: item)));
+      },
+                child: Container(
         height: 180,
+        width: MediaQuery.of(context).size.width * 0.9,
         margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
-          image: DecorationImage(
-              image: NetworkImage(item.imageUrl), fit: BoxFit.cover),
+      image: DecorationImage(
+        image: _imageProvider(item.imageUrl), fit: BoxFit.cover),
         ),
         child: Container(
           decoration: BoxDecoration(
@@ -284,7 +322,7 @@ class HomeScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(item.title,
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: Colors.white, fontWeight: FontWeight.bold)),
               Text(item.subtitle,
                   style: Theme.of(context)
@@ -292,7 +330,7 @@ class HomeScreen extends StatelessWidget {
                       .bodyMedium
                       ?.copyWith(color: Colors.white70)),
               Text("Ksh. ${item.price}",
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.white, fontWeight: FontWeight.w600)),
             ],
           ),
@@ -302,47 +340,110 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildOfferCard(BuildContext context, Offer offer) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(colors: [
-          primaryColor.withOpacity(0.9),
-          primaryColor.withOpacity(0.7)
-        ]),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(offer.title,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 6),
-                Text(offer.description,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: Colors.white70)),
-              ],
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+    decoration: BoxDecoration(
+      color: Colors.grey[50],
+      borderRadius: BorderRadius.circular(20),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.08),
+          blurRadius: 12,
+          offset: const Offset(0, 6),
+        ),
+      ],
+    ),
+    child: ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: primaryColor,
+            width: 0.5,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          children: [
+            // Text section with extra horizontal padding
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16), // ← Added padding
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start, // ← Changed to start for better alignment
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      offer.title,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: primaryColor,
+                          ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      offer.description,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: Colors.grey[700],
+                            height: 1.4,
+                            ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        'Limited Time Offer',
+                        style: TextStyle(
+                          color: primaryColor,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          const SizedBox(width: 10),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(offer.imageUrl,
-                width: 80, height: 80, fit: BoxFit.cover),
-          ),
-        ],
+            const SizedBox(width: 12), // Slightly reduced gap for balance
+            // Image section (no extra padding, stays flush)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 160,
+                height: 160,
+                child: GestureDetector(
+                  onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => OfferItemScreen(offer: offer))),
+                  child: Image(
+                    image: _imageProvider(offer.imageUrl),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildPopularCard(BuildContext context, PopularItem item) {
-    double cardWidth = MediaQuery.of(context).size.width * 0.4; // 40% of screen
+    double cardWidth = MediaQuery.of(context).size.width * 0.6; // 40% of screen
 
     return Container(
       width: cardWidth,
@@ -356,14 +457,25 @@ class HomeScreen extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.network(item.imageUrl,
-                height: 100, width: 140, fit: BoxFit.cover),
-          ),
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => PopularItemScreen(item: item))),
+              child: ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
+                child: Image(
+                  image: _imageProvider(item.imageUrl),
+                  height: 220,
+                  width: 320,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
           Padding(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -387,39 +499,62 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildTestimonialCard(BuildContext context, Testimonial t) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text("⭐" * t.rating,
-              style: const TextStyle(color: Colors.amber, fontSize: 16)),
-          const SizedBox(height: 6),
-          Text(t.comment,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyMedium
-                  ?.copyWith(color: Colors.black87)),
-          const SizedBox(height: 6),
-          Text("- ${t.user}",
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontStyle: FontStyle.italic, color: Colors.black54)),
-        ],
-      ),
-    );
-  }
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    padding: const EdgeInsets.all(16),
+    decoration: BoxDecoration(
+  borderRadius: BorderRadius.circular(16),
+  gradient: LinearGradient(
+    colors: [
+      Colors.grey[50]!,
+      Colors.grey[100]!,
+    ],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  ),
+  boxShadow: [
+    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 6)
+  ],
+),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("⭐" * t.rating,
+            style: const TextStyle(color: Colors.amber, fontSize: 16)),
+        const SizedBox(height: 6),
+        Text(t.comment,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium
+                ?.copyWith(color: Colors.black87)),
+        const SizedBox(height: 6),
+        Text("- ${t.user}",
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                fontStyle: FontStyle.italic, color: Colors.black54)),
+      ],
+    ),
+  );
+}
 
   Widget _buildActionCard(BuildContext context,
-      {required IconData icon, required String label, required Color color}) {
-    return Column(
+    {required IconData icon, required String label, required Color color}) {
+  return Container(
+    padding: const EdgeInsets.all(10),
+    // Remove alignment or set to top-left if needed; not necessary here
+    decoration: BoxDecoration(
+      color: Colors.white60,
+      borderRadius: BorderRadius.circular(30),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.04),
+          blurRadius: 6,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center, // 👈 This makes children align to the left
+      mainAxisSize: MainAxisSize.min, // Prevents unnecessary vertical stretch
       children: [
         Container(
           width: 70,
@@ -430,13 +565,18 @@ class HomeScreen extends StatelessWidget {
           ),
           child: Icon(icon, color: color, size: 32),
         ),
-        const SizedBox(height: 8),
-        Text(label,
-            style: Theme.of(context)
-                .textTheme
-                .bodyMedium
-                ?.copyWith(fontWeight: FontWeight.w600)),
+        // const SizedBox(height: 8),
+        // Text(
+        //   label,
+        //   style: Theme.of(context)
+        //       .textTheme
+        //       .bodyMedium
+        //       ?.copyWith(fontWeight: FontWeight.w500),
+        //   maxLines: 1,
+        //   overflow: TextOverflow.ellipsis,
+        // ),
       ],
-    );
-  }
+    ),
+  );
+}
 }

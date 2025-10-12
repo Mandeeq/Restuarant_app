@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'theme.dart';
-import 'screens/onboarding/onboarding_scrreen.dart';
-import 'services/app_state_service.dart';
-import 'entry_point.dart';
-import 'screens/admin/admin_dashboard_screen.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:qaffee_clean/screens/statemanagement/cart_provider.dart';
+import 'constants.dart';
+import 'screens/onboarding/onboarding_scrreen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-Future main() async {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
@@ -18,20 +17,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
+    return 
+    MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AppStateService()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
+        // add other providers here if you have them
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
+      child:
+       MaterialApp(
         title: 'The Flutter Way - Foodly UI Kit',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           useMaterial3: false,
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF603D35)),
-          textTheme: GoogleFonts.spaceGroteskTextTheme().copyWith(
-            bodyMedium: const TextStyle(color: Color(0xFF603D35)),
-            bodySmall: const TextStyle(color: Color(0xFF603D35)),
-          ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF603D35),
@@ -42,80 +40,22 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
+          // Use Google Fonts Space Grotesk across the app
+          textTheme: GoogleFonts.spaceGroteskTextTheme(
+            Theme.of(context).textTheme.apply(
+                  bodyColor: const Color(0xFF603D35),
+                  displayColor: const Color(0xFF603D35),
+                ),
+          ),
+          fontFamily: GoogleFonts.spaceGrotesk().fontFamily,
           inputDecorationTheme: const InputDecorationTheme(
             contentPadding: EdgeInsets.all(defaultPadding),
             hintStyle: TextStyle(color: Color(0xFF603D35)),
           ),
         ),
-        home: const AppInitializer(),
+        home: const OnboardingScreen(),
       ),
-    );
-  }
-}
-
-class AppInitializer extends StatefulWidget {
-  const AppInitializer({super.key});
-
-  @override
-  State<AppInitializer> createState() => _AppInitializerState();
-}
-
-class _AppInitializerState extends State<AppInitializer> {
-  bool _isInitialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    final appState = Provider.of<AppStateService>(context, listen: false);
-
-    try {
-      await appState.initialize();
-    } catch (e) {
-      print('❌ App initialization failed: $e');
-    } finally {
-      setState(() {
-        _isInitialized = true;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!_isInitialized) {
-      return const Scaffold(
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularProgressIndicator(),
-              SizedBox(height: 16),
-              Text('Initializing app...'),
-            ],
-          ),
-        ),
       );
-    }
-
-    return Consumer<AppStateService>(
-      builder: (context, appState, child) {
-        // Check if user is already authenticated
-        if (appState.isAuthenticated) {
-          // Redirect to admin dashboard if user is admin
-          if (appState.isAdmin) {
-            return const AdminDashboardScreen();
-          } else {
-            // Redirect to main app for regular users
-            return const EntryPoint();
-          }
-        }
-
-        // Show onboarding for new users
-        return const OnboardingScreen();
-      },
-    );
+    
   }
 }

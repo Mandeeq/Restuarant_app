@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme.dart';
 import '../../models/menu_item_model.dart';
+import '../../utils/image_utils.dart';
 import '../../services/api_service.dart';
 import '../payment/cart_page.dart';
 import 'menu_item_screen.dart';
@@ -225,11 +226,11 @@ class _MenuScreenState extends State<MenuScreen> {
                 children: [
                   // Food Image
                   Container(
-                    width: 130,
-                    height: 135,
+                    width: 140,
+                    height: 145,
                     child: ClipRRect(
-                      child: Image.network(
-                        item.imageUrl,
+                      child: Image(
+                        image: ImageUtils.getImageProvider(item.imageUrl),
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
@@ -312,7 +313,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                 color: Colors.grey[600],
                                 height: 1.3,
                               ),
-                              maxLines: 3,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -327,7 +328,7 @@ class _MenuScreenState extends State<MenuScreen> {
                                 "\Ksh ${item.price.toStringAsFixed(2)}",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   color: Colors.green[800],
                                 ),
                               ),

@@ -1,11 +1,12 @@
+// lib/screens/order/order_details_screen.dart
 import 'package:flutter/material.dart';
-import '../../components/buttons/primary_button.dart';
 import '../../theme.dart';
 import '../../models/order_model.dart';
 import '../../services/api_service.dart';
 import 'components/order_item_card.dart';
 import 'components/price_row.dart';
 import 'components/total_price.dart';
+import 'order_detail_bottom_sheet.dart';
 
 class OrderDetailsScreen extends StatelessWidget {
   const OrderDetailsScreen({super.key});
@@ -13,7 +14,20 @@ class OrderDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Your Orders")),
+      backgroundColor: backgroundColor,
+      appBar: AppBar(
+        title: const Text(
+          "Your Orders",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.white,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: primaryColor,
+        elevation: 0,
+      ),
       body: FutureBuilder<List<Order>>(
         future: ApiService.fetchOrders(),
         builder: (context, snapshot) {
@@ -29,8 +43,11 @@ class OrderDetailsScreen extends StatelessWidget {
                   Text('Error: ${snapshot.error}'),
                   const SizedBox(height: 16),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                    ),
                     onPressed: () {
-                      // Refresh the page
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
@@ -44,16 +61,39 @@ class OrderDetailsScreen extends StatelessWidget {
               ),
             );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.shopping_bag_outlined,
-                      size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('No orders found.'),
-                  SizedBox(height: 8),
-                  Text('Start by placing your first order!'),
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: backgroundColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.shopping_bag_outlined,
+                      size: 64,
+                      color: primaryColor,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'No orders found',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: titleColor,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Start by placing your first order!',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: bodyTextColor,
+                    ),
+                  ),
                 ],
               ),
             );
@@ -61,56 +101,90 @@ class OrderDetailsScreen extends StatelessWidget {
 
           final orders = snapshot.data!;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
-            child: Column(
-              children: [
-                const SizedBox(height: defaultPadding),
-                ...orders.map((order) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: defaultPadding / 2),
-                      child: OrderCard(order: order),
-                    )),
-                const SizedBox(height: defaultPadding * 2),
-                PrimaryButton(
-                  text: "Place New Order",
-                  press: () async {
-                    // Create a simple test order
-                    final testOrder = Order.simple(
-                      title: "Flutter Samosa",
-                      price: 6.5,
-                      numOfItem: 1,
-                    );
-
-                    try {
-                      final createdOrder =
-                          await ApiService.createOrder(testOrder);
-                      if (context.mounted) {
-                        final snackBar = SnackBar(
-                          content:
-                              Text("✅ Order placed! ID: ${createdOrder.id}"),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        // Refresh the page
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const OrderDetailsScreen(),
-                          ),
-                        );
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        final snackBar = SnackBar(
-                          content: Text("❌ Failed to place order: $e"),
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      }
-                    }
+          return ListView.builder(
+            padding: const EdgeInsets.all(defaultPadding),
+            itemCount: orders.length,
+            itemBuilder: (context, index) {
+              final order = orders[index];
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    showOrderDetailBottomSheet(context, order);
                   },
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(defaultPadding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Order #${order.id?.substring(0, 8) ?? 'N/A'}',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: titleColor,
+                                ),
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 5,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _getStatusColor(order.orderStatus),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      order.orderStatus.toUpperCase(),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    order.createdAt != null
+                                        ? '${order.createdAt!.hour}:${order.createdAt!.minute.toString().padLeft(2, '0')}'
+                                        : '',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: bodyTextColor,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '\Ksh ${order.totalAmount.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: titleColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ],
-            ),
+              );
+            },
           );
         },
       ),
@@ -126,7 +200,11 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(defaultPadding),
         child: Column(
@@ -137,13 +215,17 @@ class OrderCard extends StatelessWidget {
               children: [
                 Text(
                   'Order #${order.id?.substring(0, 8) ?? 'N/A'}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: titleColor,
+                  ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: _getStatusColor(order.orderStatus),
                     borderRadius: BorderRadius.circular(12),
@@ -162,35 +244,44 @@ class OrderCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Service: ${order.serviceType}',
-              style: Theme.of(context).textTheme.bodySmall,
+              style: TextStyle(
+                fontSize: 14,
+                color: bodyTextColor,
+              ),
             ),
             Text(
               'Payment: ${order.paymentMethod} (${order.paymentStatus})',
-              style: Theme.of(context).textTheme.bodySmall,
+              style: TextStyle(
+                fontSize: 14,
+                color: bodyTextColor,
+              ),
             ),
             if (order.createdAt != null)
               Text(
                 'Date: ${_formatDate(order.createdAt!)}',
-                style: Theme.of(context).textTheme.bodySmall,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: bodyTextColor,
+                ),
               ),
-            const Divider(),
-            ...order.items.map((item) => OrderedItemCard(
-                  title: item.name,
-                  description:
-                      item.specialInstructions ?? 'No special instructions',
-                  numOfItem: item.quantity,
-                  price: item.price,
-                )),
-            const Divider(),
+            const Divider(color: Colors.grey, height: 24),
+            ...order.items.map(
+              (item) => OrderedItemCard(
+                title: item.name,
+                description: item.specialInstructions ?? 'No special instructions',
+                numOfItem: item.quantity,
+                price: item.price,
+              ),
+            ),
+            const Divider(color: Colors.grey, height: 24),
             PriceRow(text: "Subtotal", price: order.totalAmount),
             if (order.deliveryFee > 0)
               PriceRow(text: "Delivery", price: order.deliveryFee),
             if (order.discountApplied > 0)
               PriceRow(text: "Discount", price: -order.discountApplied),
             TotalPrice(
-                price: order.totalAmount +
-                    order.deliveryFee -
-                    order.discountApplied),
+              price: order.totalAmount + order.deliveryFee - order.discountApplied,
+            ),
           ],
         ),
       ),
@@ -217,6 +308,29 @@ class OrderCard extends StatelessWidget {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
+    return _formatDate(date);
   }
+}
+
+Color _getStatusColor(String status) {
+  switch (status.toLowerCase()) {
+    case 'pending':
+      return Colors.orange;
+    case 'confirmed':
+      return Colors.blue;
+    case 'preparing':
+      return Colors.purple;
+    case 'out-for-delivery':
+      return Colors.indigo;
+    case 'delivered':
+      return Colors.green;
+    case 'cancelled':
+      return Colors.red;
+    default:
+      return Colors.grey;
+  }
+}
+
+String _formatDate(DateTime date) {
+  return '${date.day}/${date.month}/${date.year} ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
 }

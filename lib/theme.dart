@@ -8,9 +8,9 @@ const Color backgroundColor = Color.fromARGB(255, 207, 207, 207); // Warm off-wh
 const Color cardColor = Colors.white;
 
 // Legacy constants from constants.dart
-const Color titleColor = Color(0xFF010F07);
+const Color titleColor = Color.fromARGB(255, 33, 7, 7);
 const Color accentColor = Color(0xFF603D35);
-const Color bodyTextColor = Color(0xFF868686);
+const Color bodyTextColor = Color.fromARGB(255, 84, 84, 84);
 const Color inputColor = Color(0xFFFBFBFB);
 
 const double defaultPadding = 16.0;

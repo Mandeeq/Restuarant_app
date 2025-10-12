@@ -7,7 +7,7 @@ import 'theme.dart';
 import 'screens/home/home_screen.dart';
 import 'screens/orderDetails/order_details_screen.dart';
 import 'screens/profile/profile_screen.dart';
-import 'screens/cart_page.dart';
+import 'screens/payment/cart_page.dart';
 import 'screens/statemanagement/cart_provider.dart';
 import 'screens/menu/menu_screen.dart'; // ✅ Import your MenuScreen
 
@@ -34,7 +34,10 @@ class _EntryPointState extends State<EntryPoint> {
 
     final List<Widget> screens = [
       const HomeScreen(),
-      // const MenuScreen(), // ✅ Use your real MenuScreen here
+      MenuScreen(
+        cartItems: cart.items,
+        onAddToCart: (item) => cart.addItem(item),
+      ),
       const OrderDetailsScreen(),
       const ProfileScreen(),
     ];
@@ -53,7 +56,7 @@ class _EntryPointState extends State<EntryPoint> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CartPage(),
+                    builder: (context) => const CartPage(cartItems: [],),
                   ),
                 );
               },

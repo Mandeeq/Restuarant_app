@@ -20,14 +20,17 @@ class ItemCard extends StatelessWidget {
   final VoidCallback press;
 
   Widget buildImage(String? imageUrl) {
-    final fallbackUrl = ImageUtils.getDefaultImageUrl();
-    final fullImageUrl = ImageUtils.getImageUrl(imageUrl);
+    final provider = ImageUtils.getImageUrl(imageUrl);
 
-    return Image.network(
-      fullImageUrl,
+    return Image(
+      image: NetworkImage(provider),
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        return Image.network(fallbackUrl, fit: BoxFit.cover);
+        // If provider fails, fall back to bundled placeholder
+        return const Image(
+          image: AssetImage('assets/images/placeholder.png'),
+          fit: BoxFit.cover,
+        );
       },
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) return child;

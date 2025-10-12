@@ -2,17 +2,18 @@
 import 'package:flutter/material.dart';
 import '../../models/menu_item_model.dart';
 import '../../theme.dart';
+import '../../utils/image_utils.dart';
 
 class MenuItemScreen extends StatelessWidget {
   final MenuItem menuItem;
-  final Function(String) onAddToCart;
+  final Function(String)? onAddToCart;
   final List<String> cartItems;
 
   const MenuItemScreen({
     super.key,
     required this.menuItem,
-    required this.onAddToCart,
-    required this.cartItems,
+    this.onAddToCart,
+    this.cartItems = const [],
   });
 
   @override
@@ -33,13 +34,13 @@ class MenuItemScreen extends StatelessWidget {
                   // Hero Image
                   Hero(
                     tag: 'menuItemImage_${menuItem.id}',
-                    child: Image.network(
-                      menuItem.imageUrl,
+                    child: Image(
+                      image: ImageUtils.getImageProvider(menuItem.imageUrl),
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
-                        print(
-                            '❌ Image loading error for ${menuItem.name}: $error');
-                        print('❌ Image URL: ${menuItem.imageUrl}');
+                        // Log and show a placeholder when image fails
+                        // ignore: avoid_print
+                        print('❌ Image loading error for ${menuItem.name}: $error');
                         return Container(
                           color: Colors.grey[300],
                           child: const Center(
@@ -71,18 +72,20 @@ class MenuItemScreen extends StatelessWidget {
                     ),
                   ),
                   // Gradient overlay for better text readability
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.6),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  ),
+                  // Container(
+                  //   decoration: BoxDecoration(
+                  //     gradient: LinearGradient(
+                  //       begin: Alignment.bottomCenter,
+                  //       end: Alignment.topCenter,
+                  //       colors: [
+                  //         backgroundColor.withOpacity(0.9),
+                  //         Colors.transparent,
+                  //         Colors.transparent,
+                  //         Colors.transparent,
+                  //       ],
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -118,24 +121,16 @@ class MenuItemScreen extends StatelessWidget {
           // Content Section
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(defaultPadding),
+              padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Title and Price Section
                   Container(
-                    padding: const EdgeInsets.all(defaultPadding),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
+                      //color: Colors.white,
+                      ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -194,17 +189,10 @@ class MenuItemScreen extends StatelessWidget {
 
                   // Description Section
                   Container(
-                    padding: const EdgeInsets.all(defaultPadding),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      //color: Colors.white,
+                      border: Border(left: BorderSide(color: primaryColor, width: 4)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -212,8 +200,9 @@ class MenuItemScreen extends StatelessWidget {
                         Text(
                           "Description",
                           style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
                                     color: titleColor,
+                                    // color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                         ),
@@ -223,8 +212,9 @@ class MenuItemScreen extends StatelessWidget {
                               ? menuItem.description
                               : "No description available.",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 12,
                             color: bodyTextColor,
+                            // color: Colors.white70,
                             height: 1.6,
                           ),
                         ),
@@ -239,16 +229,8 @@ class MenuItemScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(defaultPadding),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
+                      border: Border(left: BorderSide(color: primaryColor, width: 4)),
+                    ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -256,7 +238,7 @@ class MenuItemScreen extends StatelessWidget {
                             "Dietary Information",
                             style: Theme.of(context)
                                 .textTheme
-                                .titleLarge
+                                .titleMedium
                                 ?.copyWith(
                                   color: titleColor,
                                   fontWeight: FontWeight.bold,
@@ -301,15 +283,7 @@ class MenuItemScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(defaultPadding),
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                      border: Border(left: BorderSide(color: primaryColor, width: 4)),
                     ),
                     child: Row(
                       children: [
@@ -334,14 +308,15 @@ class MenuItemScreen extends StatelessWidget {
                               style: TextStyle(
                                 color: bodyTextColor,
                                 fontSize: 14,
+                                fontWeight: FontWeight.bold
                               ),
                             ),
                             Text(
                               "${menuItem.preparationTime} minutes",
                               style: TextStyle(
                                 color: titleColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                                
                               ),
                             ),
                           ],
@@ -369,7 +344,9 @@ class MenuItemScreen extends StatelessWidget {
                         elevation: 2,
                       ),
                       onPressed: () {
-                        onAddToCart(menuItem.name);
+                        if (onAddToCart != null) {
+                          onAddToCart!(menuItem.name);
+                        }
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Added ${menuItem.name} to cart'),
@@ -390,10 +367,10 @@ class MenuItemScreen extends StatelessWidget {
                           const Icon(Icons.shopping_cart_checkout, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            "Add to Cart - \$${menuItem.price.toStringAsFixed(2)}",
+                            "Add to Cart - \Ksh. ${menuItem.price.toStringAsFixed(2)}",
                             style: const TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],

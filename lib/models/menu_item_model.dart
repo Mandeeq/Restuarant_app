@@ -31,8 +31,9 @@ class MenuItem {
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
     try {
-      // Construct full image URL from backend using utility
-      String imageUrl = ImageUtils.getImageUrl(json['imageUrl']);
+  // Keep raw image path from backend; ImageUtils.getImageProvider will
+  // resolve to a NetworkImage using baseUrl or fall back to a placeholder.
+  String imageUrl = json['imageUrl'] ?? '';
 
       return MenuItem(
         id: json['_id'] ?? '',

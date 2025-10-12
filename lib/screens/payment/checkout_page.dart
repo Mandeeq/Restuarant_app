@@ -1,12 +1,11 @@
-import 'dart:async';
+// lib/screens/checkout/checkout_page.dart
 import 'package:flutter/material.dart';
-import '../../models/order_model.dart';
-import '../../services/api_service.dart';
+import 'package:provider/provider.dart';
+import '../statemanagement/cart_provider.dart';
+import '../../theme.dart';
 
 class CheckoutPage extends StatefulWidget {
-  final List<String> cartItems;
-
-  const CheckoutPage({super.key, required this.cartItems});
+  const CheckoutPage({super.key});
 
   @override
   State<CheckoutPage> createState() => _CheckoutPageState();
@@ -14,386 +13,353 @@ class CheckoutPage extends StatefulWidget {
 
 class _CheckoutPageState extends State<CheckoutPage> {
   String _selectedPayment = 'Cash';
-  final _phoneController = TextEditingController();
-  bool _isLoading = false;
-  bool _paymentInitiated = false;
-  String? _paymentId;
-  Timer? _statusCheckTimer;
+  final TextEditingController _allergyController = TextEditingController();
+  final TextEditingController _mpesaController = TextEditingController();
+  bool _needCutlery = false;
 
-  int get totalAmount => widget.cartItems.length * 150;
-
-  Future<void> _placeOrder() async {
-    if (_selectedPayment == 'M-Pesa') {
-      if (_phoneController.text.trim().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please enter a valid phone number'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-      await _initiateMpesaPayment();
-    } else {
-      _showOrderSuccessDialog();
-    }
-  }
-
-  Future<void> _initiateMpesaPayment() async {
-    setState(() => _isLoading = true);
-
-    try {
-      // Create order first
-      final order = await ApiService.createOrder(Order(
-        items: widget.cartItems
-            .map((item) => OrderItem(
-                  menuItemId: 'temp_${DateTime.now().millisecondsSinceEpoch}',
-                  name: item,
-                  price: 150.0,
-                  quantity: 1,
-                ))
-            .toList(),
-        totalAmount: totalAmount.toDouble(),
-        serviceType: 'delivery',
-        paymentMethod: 'mpesa',
-      ));
-
-      // Initiate M-Pesa payment
-      final response = await ApiService.initiateMpesaPayment(
-        orderId: order.id!,
-        phoneNumber: _phoneController.text.trim(),
-      );
-
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _paymentInitiated = true;
-          _paymentId = response.data?.paymentId;
-        });
-
-        // Start checking payment status
-        _startPaymentStatusCheck();
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response.message),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 5),
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Payment failed: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  void _startPaymentStatusCheck() {
-    if (_paymentId == null) return;
-
-    _statusCheckTimer =
-        Timer.periodic(const Duration(seconds: 10), (timer) async {
-      try {
-        final paymentData = await ApiService.checkPaymentStatus(_paymentId!);
-
-        if (mounted) {
-          if (paymentData.status == 'completed') {
-            timer.cancel();
-            _showPaymentSuccessDialog();
-          } else if (paymentData.status == 'failed') {
-            timer.cancel();
-            _showPaymentFailedDialog();
-          }
-        }
-      } catch (e) {
-        // Continue checking
-      }
-    });
-  }
-
-  void _showPaymentSuccessDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Payment Successful!'),
-        content: const Text(
-            'Your M-Pesa payment has been processed successfully. You will receive a confirmation shortly.'),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context); // Go back to previous screen
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showPaymentFailedDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Payment Failed'),
-        content: const Text(
-            'Your M-Pesa payment was not successful. Please try again.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _initiateMpesaPayment();
-            },
-            child: const Text('Retry'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showOrderSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('✅ Order Placed'),
-        content:
-            Text('Payment Method: $_selectedPayment\nTotal: KSh $totalAmount'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (ApiService.currentUser?.phone != null) {
-      _phoneController.text = ApiService.currentUser!.phone!;
-    }
-  }
+  String _selectedDelivery = 'Standard';
+  int _deliveryCharge = 0;
 
   @override
   void dispose() {
-    _phoneController.dispose();
-    _statusCheckTimer?.cancel();
+    _allergyController.dispose();
+    _mpesaController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final cart = context.watch<CartProvider>();
+    double totalAmount = cart.getTotal() + _deliveryCharge;
+    int totalItems = cart.items.length;
+
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text('Checkout'),
+        title: const Text(
+          'Checkout',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         centerTitle: true,
+        backgroundColor: primaryColor,
+        elevation: 0,
       ),
       body: SafeArea(
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.all(defaultPadding),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      '🛒 Items in Your Cart',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    _buildCard(
+                      title: "Items in Your Cart",
+                      icon: Icons.shopping_cart,
+                      child: cart.items.isEmpty
+                          ? const Text("Your cart is empty")
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: cart.items.length,
+                              itemBuilder: (context, index) => Column(
+                                children: [
+                                  ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: Icon(
+                                      Icons.fastfood,
+                                      color: primaryColor,
+                                    ),
+                                    title: Text(
+                                      cart.items[index],
+                                      style: TextStyle(color: titleColor),
+                                    ),
+                                    trailing: Text(
+                                      '\Ksh ${(cart.getItemPrice(cart.items[index]) * 150).toStringAsFixed(0)}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                  if (index != cart.items.length - 1)
+                                    const Divider(),
+                                ],
+                              ),
+                            ),
                     ),
-                    const SizedBox(height: 10),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: widget.cartItems.length,
-                      itemBuilder: (context, index) => ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text(widget.cartItems[index]),
-                        trailing: const Text('KSh 150'),
+                    const SizedBox(height: 20),
+                    _buildCard(
+                      title: "Any Allergies?",
+                      icon: Icons.warning_amber,
+                      child: TextField(
+                        controller: _allergyController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText: "Let us know if you have any allergies (optional)...",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          filled: true,
+                          fillColor: inputColor,
+                          prefixIcon: Icon(
+                            Icons.note_alt_outlined,
+                            color: bodyTextColor,
+                          ),
+                        ),
                       ),
                     ),
-                    const Divider(height: 30, thickness: 1),
-                    Text(
-                      '🧾 Total: KSh $totalAmount',
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.w600),
+                    const SizedBox(height: 20),
+                    _buildCard(
+                      title: "Need Cutlery?",
+                      icon: Icons.restaurant,
+                      child: SwitchListTile.adaptive(
+                        title: const Text("Add Cutlery"),
+                        value: _needCutlery,
+                        onChanged: (value) => setState(() => _needCutlery = value),
+                        secondary: Icon(Icons.flatware, color: primaryColor),
+                      ),
                     ),
-                    const SizedBox(height: 25),
-                    const Text(
-                      '💳 Choose Payment Method',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                    ),
-                    RadioListTile<String>(
-                      title: const Text('Cash'),
-                      value: 'Cash',
-                      groupValue: _selectedPayment,
-                      onChanged: (value) =>
-                          setState(() => _selectedPayment = value!),
-                    ),
-                    RadioListTile<String>(
-                      title: Row(
+                    const SizedBox(height: 20),
+                    _buildCard(
+                      title: "Delivery Option",
+                      icon: Icons.local_shipping,
+                      child: Column(
                         children: [
-                          Icon(Icons.phone_android,
-                              color: Colors.green, size: 20),
-                          const SizedBox(width: 8),
-                          const Text('M-Pesa'),
+                          RadioListTile<String>(
+                            title: const Text("Standard Delivery (Free, may delay)"),
+                            secondary: Icon(Icons.access_time, color: primaryColor),
+                            value: "Standard",
+                            groupValue: _selectedDelivery,
+                            onChanged: (value) => setState(() {
+                              _selectedDelivery = value!;
+                              _deliveryCharge = 0;
+                            }),
+                          ),
+                          const Divider(height: 1),
+                          RadioListTile<String>(
+                            title: const Text("Economy Delivery (\Ksh 200, faster)"),
+                            secondary: const Icon(Icons.bolt, color: Colors.orange),
+                            value: "Economy",
+                            groupValue: _selectedDelivery,
+                            onChanged: (value) => setState(() {
+                              _selectedDelivery = value!;
+                              _deliveryCharge = 200;
+                            }),
+                          ),
                         ],
                       ),
-                      value: 'M-Pesa',
-                      groupValue: _selectedPayment,
-                      onChanged: (value) =>
-                          setState(() => _selectedPayment = value!),
                     ),
-                    if (_selectedPayment == 'M-Pesa') ...[
-                      const SizedBox(height: 16),
-                      Card(
-                        color: Colors.green.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.phone_android,
-                                      color: Colors.green),
-                                  const SizedBox(width: 8),
-                                  const Text('M-Pesa Payment',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                              const SizedBox(height: 12),
-                              TextFormField(
-                                controller: _phoneController,
+                    const SizedBox(height: 20),
+                    _buildCard(
+                      title: "Choose Payment Method",
+                      icon: Icons.payment,
+                      child: Column(
+                        children: [
+                          RadioListTile<String>(
+                            title: const Text('Cash'),
+                            secondary: Icon(Icons.attach_money, color: primaryColor),
+                            value: 'Cash',
+                            groupValue: _selectedPayment,
+                            onChanged: (value) => setState(() => _selectedPayment = value!),
+                          ),
+                          const Divider(height: 1),
+                          RadioListTile<String>(
+                            title: const Text('M-Pesa'),
+                            secondary: const Icon(Icons.phone_android, color: Colors.green),
+                            value: 'M-Pesa',
+                            groupValue: _selectedPayment,
+                            onChanged: (value) => setState(() => _selectedPayment = value!),
+                          ),
+                          if (_selectedPayment == 'M-Pesa')
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12),
+                              child: TextField(
+                                controller: _mpesaController,
                                 keyboardType: TextInputType.phone,
-                                decoration: const InputDecoration(
-                                  hintText:
-                                      'Enter M-Pesa phone number (e.g., 0712345678)',
-                                  border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.phone),
-                                  suffixIcon: Icon(Icons.phone_android,
-                                      color: Colors.green),
+                                decoration: InputDecoration(
+                                  hintText: 'Enter M-Pesa number',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(color: Colors.grey),
+                                  ),
+                                  prefixIcon: const Icon(Icons.phone_android, color: Colors.green),
+                                  filled: true,
+                                  fillColor: inputColor,
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
+                            ),
+                        ],
                       ),
-                    ],
-                    if (_selectedPayment == 'M-Pesa') ...[
-                      const SizedBox(height: 16),
-                      Card(
-                        color: Colors.orange.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(Icons.info_outline,
-                                      color: Colors.orange.shade700),
-                                  const SizedBox(width: 8),
-                                  const Text('M-Pesa Payment Instructions',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              const Text(
-                                '• Ensure your phone number is registered with M-Pesa\n'
-                                '• You will receive an STK push notification\n'
-                                '• Enter your M-Pesa PIN when prompted\n'
-                                '• Payment will be processed automatically\n'
-                                '• You will receive an SMS confirmation',
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ],
+                    ),
+                    const SizedBox(height: 20),
+                    _buildCard(
+                      title: "Order Summary",
+                      icon: Icons.receipt_long,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSummaryRow("Total Items", "$totalItems"),
+                          _buildSummaryRow(
+                            "Delivery",
+                            _deliveryCharge == 0
+                                ? "Free (Standard)"
+                                : "\Ksh $_deliveryCharge (Economy)",
                           ),
-                        ),
-                      ),
-                    ],
-                    if (_paymentInitiated) ...[
-                      const SizedBox(height: 16),
-                      Card(
-                        color: Colors.blue.shade50,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Row(
-                            children: [
-                              const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
-                              ),
-                              const SizedBox(width: 12),
-                              const Expanded(
-                                child: Text(
-                                  'Checking M-Pesa payment status...',
-                                  style: TextStyle(fontWeight: FontWeight.w500),
-                                ),
-                              ),
-                            ],
+                          _buildSummaryRow(
+                            "Total Amount",
+                            "\Ksh ${totalAmount.toStringAsFixed(0)}",
+                            isTotal: true,
                           ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ],
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                  16, 10, 16, 30), // lifted the button
+            // Place Order Button
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 6,
+                    color: Colors.black.withOpacity(0.05),
+                  ),
+                ],
+              ),
               child: SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _placeOrder,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.check_circle_outline, size: 22, color: Colors.white),
+                  label: const Text('Place Order', style: TextStyle(color: Colors.white)),
+                  onPressed: () => _showOrderConfirmation(context, totalAmount, totalItems),
                   style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    backgroundColor: const Color(0xFF6D4C41),
-                    textStyle: const TextStyle(fontSize: 16),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white)))
-                      : Text(_selectedPayment == 'M-Pesa'
-                          ? 'Pay with M-Pesa'
-                          : 'Place Order'),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildCard({
+    required String title,
+    required IconData icon,
+    required Widget child,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      child: Card(
+        color: Colors.white,
+        elevation: 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(defaultPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(icon, color: primaryColor),
+                  const SizedBox(width: 8),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: titleColor,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              child,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSummaryRow(String label, String value, {bool isTotal = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              color: bodyTextColor,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
+              color: isTotal ? primaryColor : titleColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showOrderConfirmation(BuildContext context, double totalAmount, int totalItems) {
+    String allergyNote = _allergyController.text.isNotEmpty
+        ? _allergyController.text
+        : "None";
+    String cutleryNote = _needCutlery ? "Yes, include cutlery" : "No cutlery";
+    String paymentInfo = _selectedPayment == 'M-Pesa'
+        ? 'M-Pesa Number: ${_mpesaController.text}'
+        : 'Cash';
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.check_circle, color: primaryColor),
+            const SizedBox(width: 8),
+            const Text('Order Placed'),
+          ],
+        ),
+        content: Text(
+          'Payment Method: $paymentInfo\n'
+          'Delivery Option: $_selectedDelivery\n'
+          'Products Ordered: $totalItems\n'
+          'Total: \Ksh ${totalAmount.toStringAsFixed(0)}\n'
+          'Allergies: $allergyNote\n'
+          'Cutlery: $cutleryNote',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<CartProvider>().clearCart();
+              Navigator.pop(context, true);
+            },
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
