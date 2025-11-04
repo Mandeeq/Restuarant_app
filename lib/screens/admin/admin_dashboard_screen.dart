@@ -538,7 +538,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
@@ -568,16 +568,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
               const SizedBox(height: 2),
-              Text(
-                description,
-                style: TextStyle(
-                  fontSize: 10,
-                  color: Colors.grey[600],
-                ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
+              // Text(
+              //   description,
+              //   style: TextStyle(
+              //     fontSize: 10,
+              //     color: Colors.grey[600],
+              //   ),
+              //   textAlign: TextAlign.center,
+              //   maxLines: 2,
+              //   overflow: TextOverflow.ellipsis,
+              // ),
             ],
           ),
         ),

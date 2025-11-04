@@ -32,13 +32,13 @@ class _PghoneLoginScreenState extends State<PghoneLoginScreen> {
                 title: "Get started with Foodly",
                 text:
                     "Enter your phone number to use foodly \nand enjoy your food :)",
-                titleStyle: const TextStyle(
+                titleStyle: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
                   color: Colors.brown,
                   letterSpacing: 1.2,
                 ),
-                textStyle: const TextStyle(
+                textStyle: TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
                   height: 1.6,

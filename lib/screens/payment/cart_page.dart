@@ -136,7 +136,7 @@ class CartPage extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              '\Ksh ${price.toStringAsFixed(2)}',
+              'Ksh ${price.toStringAsFixed(2)}',
               style: TextStyle(
                 color: primaryColor,
                 fontWeight: FontWeight.w600,
@@ -205,7 +205,7 @@ class CartPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '\Ksh ${total.toStringAsFixed(2)}',
+                    'Ksh ${total.toStringAsFixed(2)}',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,

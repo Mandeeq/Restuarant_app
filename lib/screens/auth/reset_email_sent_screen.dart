@@ -21,13 +21,13 @@ class ResetEmailSentScreen extends StatelessWidget {
             const WelcomeText(
                 title: "Reset email sent",
                 text:
-                    "We have sent a instructions email to \ntheflutterway@email.com.",titleStyle: const TextStyle(
+                    "We have sent a instructions email to \ntheflutterway@email.com.",titleStyle: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.w800,
               color: Colors.brown,
               letterSpacing: 1.2,
             ),
-              textStyle: const TextStyle(
+              textStyle: TextStyle(
                 fontSize: 16,
                 color: Colors.black54,
                 height: 1.6,

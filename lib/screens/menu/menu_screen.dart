@@ -225,7 +225,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Food Image
-                  Container(
+                  SizedBox(
                     width: 140,
                     height: 145,
                     child: ClipRRect(
@@ -325,7 +325,7 @@ class _MenuScreenState extends State<MenuScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "\Ksh ${item.price.toStringAsFixed(2)}",
+                                "Ksh ${item.price.toStringAsFixed(2)}",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,

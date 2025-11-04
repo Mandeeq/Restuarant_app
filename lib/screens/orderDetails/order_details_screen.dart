@@ -168,7 +168,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    '\Ksh ${order.totalAmount.toStringAsFixed(2)}',
+                                    'Ksh ${order.totalAmount.toStringAsFixed(2)}',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: titleColor,

@@ -534,7 +534,7 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   ),
                   const Spacer(),
                   Text(
-                    '\Ksh. ${order.totalAmount.toStringAsFixed(2)}',
+                    'Ksh. ${order.totalAmount.toStringAsFixed(2)}',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

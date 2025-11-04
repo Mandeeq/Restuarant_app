@@ -30,7 +30,7 @@ class RestaurantInfoMediumCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Fixed height container to prevent overflow
-            Container(
+            SizedBox(
               height: 160, // Fixed height instead of aspect ratio
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),

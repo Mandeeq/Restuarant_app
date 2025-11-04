@@ -170,7 +170,7 @@ class MenuItemScreen extends StatelessWidget {
                             ),
                             const Spacer(),
                             Text(
-                              "\Ksh ${menuItem.price.toStringAsFixed(2)}",
+                              "Ksh ${menuItem.price.toStringAsFixed(2)}",
                               style: Theme.of(context)
                                   .textTheme
                                   .headlineSmall
@@ -367,7 +367,7 @@ class MenuItemScreen extends StatelessWidget {
                           const Icon(Icons.shopping_cart_checkout, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            "Add to Cart - \Ksh. ${menuItem.price.toStringAsFixed(2)}",
+                            "Add to Cart - Ksh. ${menuItem.price.toStringAsFixed(2)}",
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,

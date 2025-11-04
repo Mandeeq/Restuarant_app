@@ -12,7 +12,7 @@ class Rating extends StatelessWidget {
 
   String? get userName => null;
 
-  get comment => null;
+  Null get comment => null;
 
   DateTime? get date => null;
 

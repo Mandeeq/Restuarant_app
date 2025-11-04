@@ -28,9 +28,9 @@ class _NumberVerifyScreenState extends State<NumberVerifyScreen> {
   Future<void> _loadUserPhone() async {
     try {
       final user = ApiService.currentUser;
-      if (user?.phone != null && user!.phone!.isNotEmpty) {
+      if (user?.phone != null && user!.phone.isNotEmpty) {
         setState(() {
-          _phoneNumber = user.phone!;
+          _phoneNumber = user.phone;
         });
         await _sendOtp();
       } else {

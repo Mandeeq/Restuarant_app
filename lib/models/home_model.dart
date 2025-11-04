@@ -56,7 +56,7 @@ class PopularItem {
     } catch (_) {
       price = 0.0;
     }
-    final category = json['category'] != null ? json['category'].toString() : null;
+    final category = json['category']?.toString();
 
     return PopularItem(id: id, name: name, imageUrl: imageUrl, price: price, category: category);
   }

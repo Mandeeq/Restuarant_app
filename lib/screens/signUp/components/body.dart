@@ -23,13 +23,13 @@ class Body extends StatelessWidget {
               const WelcomeText(
                 title: "Create Account",
                 text: "Enter your Name, Email and Password \nfor sign up.",
-                titleStyle: const TextStyle(
+                titleStyle: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
                   color: Colors.brown,
                   letterSpacing: 1.2,
                 ),
-                textStyle: const TextStyle(
+                textStyle: TextStyle(
                   fontSize: 16,
                   color: Colors.black54,
                   height: 1.6,

@@ -994,7 +994,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: selectedCategory,
+                        initialValue: selectedCategory,
                         decoration: const InputDecoration(
                           labelText: 'Category',
                           border: OutlineInputBorder(),
@@ -1018,7 +1018,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<int>(
-                              value: preparationTime,
+                              initialValue: preparationTime,
                               decoration: const InputDecoration(
                                 labelText: 'Preparation Time (min)',
                                 border: OutlineInputBorder(),

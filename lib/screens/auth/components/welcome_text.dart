@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:qaffee_clean/theme.dart';
 
 
 class WelcomeText extends StatelessWidget {

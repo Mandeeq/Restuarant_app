@@ -75,7 +75,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       style: TextStyle(color: titleColor),
                                     ),
                                     trailing: Text(
-                                      '\Ksh ${(cart.getItemPrice(cart.items[index]) * 150).toStringAsFixed(0)}',
+                                      'Ksh ${(cart.getItemPrice(cart.items[index]) * 150).toStringAsFixed(0)}',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         color: primaryColor,
@@ -139,7 +139,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                           const Divider(height: 1),
                           RadioListTile<String>(
-                            title: const Text("Economy Delivery (\Ksh 200, faster)"),
+                            title: const Text("Economy Delivery (Ksh 200, faster)"),
                             secondary: const Icon(Icons.bolt, color: Colors.orange),
                             value: "Economy",
                             groupValue: _selectedDelivery,
@@ -205,11 +205,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             "Delivery",
                             _deliveryCharge == 0
                                 ? "Free (Standard)"
-                                : "\Ksh $_deliveryCharge (Economy)",
+                                : "Ksh $_deliveryCharge (Economy)",
                           ),
                           _buildSummaryRow(
                             "Total Amount",
-                            "\Ksh ${totalAmount.toStringAsFixed(0)}",
+                            "Ksh ${totalAmount.toStringAsFixed(0)}",
                             isTotal: true,
                           ),
                         ],
@@ -346,7 +346,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
           'Payment Method: $paymentInfo\n'
           'Delivery Option: $_selectedDelivery\n'
           'Products Ordered: $totalItems\n'
-          'Total: \Ksh ${totalAmount.toStringAsFixed(0)}\n'
+          'Total: Ksh ${totalAmount.toStringAsFixed(0)}\n'
           'Allergies: $allergyNote\n'
           'Cutlery: $cutleryNote',
         ),

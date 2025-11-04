@@ -19,6 +19,7 @@ dependencies:
   google_fonts: ^6.2.1 # moved here ✅
   image_picker: ^1.2.0
 
+  http_parser: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

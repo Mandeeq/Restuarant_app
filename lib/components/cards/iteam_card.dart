@@ -65,7 +65,7 @@ class ItemCard extends StatelessWidget {
           child: Row(
             children: [
               // Fixed size image container to prevent overflow
-              Container(
+              SizedBox(
                 width: 110,
                 height: 110,
                 child: ClipRRect(

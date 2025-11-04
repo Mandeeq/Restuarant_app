@@ -420,7 +420,7 @@ class HomeScreen extends StatelessWidget {
             // Image section (no extra padding, stays flush)
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Container(
+              child: SizedBox(
                 width: 160,
                 height: 160,
                 child: GestureDetector(
