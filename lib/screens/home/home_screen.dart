@@ -105,7 +105,7 @@ class HomeScreen extends StatelessWidget {
                                     color: Colors.white, size: 18),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Kampala • Now Open',
+                                  'Kampala • We Are Open',
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium
