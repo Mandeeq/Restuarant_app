@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:qaffee_clean/screens/statemanagement/cart_provider.dart';
-import 'constants.dart';
+import 'theme.dart';
 import 'screens/onboarding/onboarding_scrreen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
           // Use Google Fonts Space Grotesk across the app
-          textTheme: GoogleFonts.spaceGroteskTextTheme(
+          textTheme: GoogleFonts.interTextTheme(
             Theme.of(context).textTheme.apply(
                   bodyColor: const Color(0xFF603D35),
                   displayColor: const Color(0xFF603D35),

@@ -120,6 +120,8 @@ class Order {
     try {
       // Debug print to help trace issues
       print('Order JSON: $json');
+      print('json[\'user\'] type: ${json['user'].runtimeType}');
+      print('json[\'user\'] value: ${json['user']}');
       return Order(
         id: json['_id'],
         userId: json['user'] is String

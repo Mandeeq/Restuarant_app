@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../statemanagement/cart_provider.dart';
 import '../../theme.dart';
+import '../../services/api_service.dart';
+import '../../models/order_model.dart';
+import '../orderDetails/order_details_screen.dart';
 
 class CheckoutPage extends StatefulWidget {
   const CheckoutPage({super.key});
@@ -15,6 +18,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   String _selectedPayment = 'Cash';
   final TextEditingController _allergyController = TextEditingController();
   final TextEditingController _mpesaController = TextEditingController();
+  final TextEditingController _deliveryAddressController = TextEditingController();
   bool _needCutlery = false;
 
   String _selectedDelivery = 'Standard';
@@ -24,6 +28,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   void dispose() {
     _allergyController.dispose();
     _mpesaController.dispose();
+    _deliveryAddressController.dispose();
     super.dispose();
   }
 
@@ -75,7 +80,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       style: TextStyle(color: titleColor),
                                     ),
                                     trailing: Text(
-                                      'Ksh ${(cart.items[index].price * 150).toStringAsFixed(0)}',
+                                      'Ksh ${(cart.items[index].price).toStringAsFixed(2)}',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         color: primaryColor,
@@ -153,6 +158,28 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     ),
                     const SizedBox(height: 20),
                     _buildCard(
+                      title: "Delivery Address",
+                      icon: Icons.home,
+                      child: TextField(
+                        controller: _deliveryAddressController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText: "Enter your delivery address...",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          filled: true,
+                          fillColor: inputColor,
+                          prefixIcon: Icon(
+                            Icons.location_on,
+                            color: bodyTextColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    _buildCard(
                       title: "Choose Payment Method",
                       icon: Icons.payment,
                       child: Column(
@@ -209,7 +236,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           ),
                           _buildSummaryRow(
                             "Total Amount",
-                            "Ksh ${totalAmount.toStringAsFixed(0)}",
+                            "Ksh ${totalAmount.toStringAsFixed(2)}",
                             isTotal: true,
                           ),
                         ],
@@ -236,7 +263,58 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.check_circle_outline, size: 22, color: Colors.white),
                   label: const Text('Place Order', style: TextStyle(color: Colors.white)),
-                  onPressed: () => _showOrderConfirmation(context, totalAmount, totalItems),
+                  onPressed: () async {
+                    final cart = context.read<CartProvider>();
+                    final orderItems = cart.items.map((menuItem) {
+                      return OrderItem(
+                        menuItemId: menuItem.id,
+                        name: menuItem.name,
+                        price: menuItem.price,
+                        quantity: 1, // Assuming quantity is 1 for each item in the cart
+                        specialInstructions: _allergyController.text,
+                      );
+                    }).toList();
+
+                    final deliveryAddress = DeliveryAddress(
+                      street: _deliveryAddressController.text,
+                      city: 'Nairobi', // Assuming a default city for now
+                    );
+
+                    final order = Order(
+                      items: orderItems,
+                      totalAmount: cart.total,
+                      deliveryFee: _deliveryCharge.toDouble(),
+                      serviceType: _selectedDelivery == 'Standard' ? 'delivery' : 'takeaway',
+                      deliveryAddress: deliveryAddress,
+                      paymentMethod: _selectedPayment.toLowerCase(),
+                      userId: ApiService.currentUser?.id,
+                    );
+
+                    try {
+                      await ApiService.createOrder(order);
+                      cart.clearCart();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Order placed successfully!'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const OrderDetailsScreen(),
+                        ),
+                        (route) => route.isFirst,
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to place order: $e'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -314,50 +392,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
               fontWeight: isTotal ? FontWeight.bold : FontWeight.w600,
               color: isTotal ? primaryColor : titleColor,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showOrderConfirmation(BuildContext context, double totalAmount, int totalItems) {
-    String allergyNote = _allergyController.text.isNotEmpty
-        ? _allergyController.text
-        : "None";
-    String cutleryNote = _needCutlery ? "Yes, include cutlery" : "No cutlery";
-    String paymentInfo = _selectedPayment == 'M-Pesa'
-        ? 'M-Pesa Number: ${_mpesaController.text}'
-        : 'Cash';
-
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Row(
-          children: [
-            Icon(Icons.check_circle, color: primaryColor),
-            const SizedBox(width: 8),
-            const Text('Order Placed'),
-          ],
-        ),
-        content: Text(
-          'Payment Method: $paymentInfo\n'
-          'Delivery Option: $_selectedDelivery\n'
-          'Products Ordered: $totalItems\n'
-          'Total: Ksh ${totalAmount.toStringAsFixed(0)}\n'
-          'Allergies: $allergyNote\n'
-          'Cutlery: $cutleryNote',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.read<CartProvider>().clearCart();
-              Navigator.pop(context, true);
-            },
-            child: const Text('OK'),
           ),
         ],
       ),

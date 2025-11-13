@@ -18,19 +18,19 @@ class TotalPrice extends StatelessWidget {
         const Text.rich(
           TextSpan(
             text: "Total ",
-            style: TextStyle(color: titleColor, fontWeight: FontWeight.w500),
+            style: TextStyle(color: titleColor, fontWeight: FontWeight.w800),
             children: [
               TextSpan(
                 text: "(incl. VAT)",
-                style: TextStyle(fontWeight: FontWeight.normal),
+                style: TextStyle(fontWeight: FontWeight.w800),
               ),
             ],
           ),
         ),
         Text(
-          "\$$price",
+          "\Ksh $price",
           style:
-              const TextStyle(color: titleColor, fontWeight: FontWeight.w500),
+              const TextStyle(color: titleColor, fontWeight: FontWeight.w800),
         ),
       ],
     );

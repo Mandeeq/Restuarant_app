@@ -1,3 +1,4 @@
+// lib/screens/profile/profile_screen.dart
 import 'package:flutter/material.dart';
 import '../../theme.dart';
 import '../../services/api_service.dart';
@@ -8,6 +9,7 @@ import 'components/payment_methods_screen.dart';
 import 'components/locations_screen.dart';
 import 'components/social_account_screen.dart';
 import 'components/refer_friends_screen.dart';
+import '../home/home_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -53,76 +55,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = ApiService.currentUser;
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text("Profile"),
+        title: const Text(
+          "Profile",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: primaryColor,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(defaultPadding),
+        padding: EdgeInsets.all(defaultPadding),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // User Info Section
-            Container(
-              padding: const EdgeInsets.all(defaultPadding),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+            // 👤 User Info Section
+            _buildSection(
+              title: "Account Information",
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Account Information",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   _buildInfoRow("Name", user?.name ?? "N/A"),
                   _buildInfoRow("Email", user?.email ?? "N/A"),
                   _buildInfoRow("Phone", user?.phone ?? "Not provided"),
-                  _buildInfoRow("Role", user?.role ?? "customer"),
+                  _buildInfoRow("Role", user?.role?.toUpperCase() ?? "CUSTOMER"),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: defaultPadding),
 
-            // Verification Status Section
-            Container(
-              padding: const EdgeInsets.all(defaultPadding),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+            // ✅ Verification Status Section
+            _buildSection(
+              title: "Verification Status",
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Verification Status",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   _buildVerificationRow(
                     "Phone Number",
                     _verificationStatus['phoneVerified'] ?? false,
@@ -133,38 +106,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _verificationStatus['emailVerified'] ?? false,
                     Icons.email,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: defaultPadding / 2),
                   if (!(_verificationStatus['emailVerified'] ?? false) ||
                       !(_verificationStatus['phoneVerified'] ?? false))
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.orange.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                        border:
-                            Border.all(color: Colors.orange.withOpacity(0.3)),
-                      ),
-                      child: const Column(
-                        children: [
-                          Icon(
-                            Icons.info_outline,
-                            color: Colors.orange,
-                            size: 20,
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Verify your account to unlock discounts and special offers!",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Colors.orange,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  const SizedBox(height: 16),
+                    _buildVerificationBanner(),
+                  const SizedBox(height: defaultPadding / 2),
                   if (!(_verificationStatus['phoneVerified'] ?? false))
                     SizedBox(
                       width: double.infinity,
@@ -176,14 +122,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               builder: (context) => const NumberVerifyScreen(),
                             ),
                           ).then((_) {
-                            // Refresh verification status when returning
                             _loadVerificationStatus();
                           });
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 0,
                         ),
                         child: const Text("Verify Phone Number"),
                       ),
@@ -192,143 +141,153 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: defaultPadding),
 
-            // Account Settings Section
-            Container(
-              padding: const EdgeInsets.all(defaultPadding),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+            // ⚙️ Account Settings Section
+            _buildSection(
+              title: "Account Settings",
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Account Settings",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                  Text(
+                    "Update your settings like notifications, payments, and profile.",
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: bodyTextColor,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    "Update your settings like notifications, payments, profile edit etc.",
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: defaultPadding),
                   _buildSettingsRow(
                     "Profile Information",
-                    "Change your account information",
+                    "Edit name, email, phone",
                     Icons.person,
-                    () => Navigator.push(
+                        () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const ProfileInfoScreen()),
+                        builder: (context) => const ProfileInfoScreen(),
+                      ),
                     ),
                   ),
                   _buildSettingsRow(
                     "Change Password",
-                    "Change your password",
+                    "Secure your account",
                     Icons.lock,
-                    () => Navigator.push(
+                        () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const ChangePasswordScreen()),
+                        builder: (context) => const ChangePasswordScreen(),
+                      ),
                     ),
                   ),
                   _buildSettingsRow(
                     "Payment Methods",
-                    "Add your credit & debit cards",
+                    "Add credit & debit cards",
                     Icons.credit_card,
-                    () => Navigator.push(
+                        () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const PaymentMethodsScreen()),
+                        builder: (context) => const PaymentMethodsScreen(),
+                      ),
                     ),
                   ),
                   _buildSettingsRow(
                     "Locations",
-                    "Add or remove your delivery locations",
+                    "Manage delivery addresses",
                     Icons.location_on,
-                    () => Navigator.push(
+                        () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const LocationsScreen()),
+                        builder: (context) => const LocationsScreen(),
+                      ),
                     ),
                   ),
                   _buildSettingsRow(
-                    "Add Social Account",
-                    "Add Facebook, Twitter etc",
-                    Icons.share,
-                    () => Navigator.push(
+                    "Social Accounts",
+                    "Connect Facebook, Google",
+                    Icons.share_outlined,
+                        () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const SocialAccountScreen()),
+                        builder: (context) => const SocialAccountScreen(),
+                      ),
                     ),
                   ),
                   _buildSettingsRow(
-                    "Refer to Friends",
-                    "Get \$10 for referring friends",
+                    "Refer Friends",
+                    "Get Ksh 100 per referral",
                     Icons.card_giftcard,
-                    () => Navigator.push(
+                        () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const ReferFriendsScreen()),
+                        builder: (context) => const ReferFriendsScreen(),
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: defaultPadding),
 
-            // Account Actions Section
-            Container(
-              padding: const EdgeInsets.all(defaultPadding),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
+            // 🚪 Account Actions
+            _buildSection(
+              title: "Account Actions",
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Account Actions",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
                   _buildActionRow(
                     "Logout",
                     Icons.logout,
                     Colors.red,
-                    () {
+                        () {
                       ApiService.clearAuthData();
-                      Navigator.pushReplacementNamed(context, '/login');
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                        (route) => false,
+                      );
                     },
                   ),
                 ],
               ),
             ),
+
+            const SizedBox(height: defaultPadding * 2),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ✅ Reusable Section Builder (matches MenuScreen card style)
+  Widget _buildSection({required String title, required Widget child}) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.06),
+            offset: const Offset(0, 1),
+            blurRadius: 6,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(defaultPadding),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: titleColor,
+              ),
+            ),
+            const SizedBox(height: defaultPadding),
+            child,
           ],
         ),
       ),
@@ -337,21 +296,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: bodyTextColor,
               fontWeight: FontWeight.w500,
             ),
           ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.right,
             ),
           ),
         ],
@@ -379,13 +341,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: isVerified ? Colors.green : Colors.grey,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              isVerified ? "Verified" : "Not Verified",
+              isVerified ? "Verified" : "Not verified",
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 12,
@@ -398,19 +360,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildVerificationBanner() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: primaryColor.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.verified_user_outlined,
+            color: primaryColor,
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              "Verify your account to unlock discounts and special offers!",
+              style: TextStyle(
+                color: primaryColor,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSettingsRow(
       String title, String subtitle, IconData icon, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: titleColor.withOpacity(0.64),
-              size: 24,
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: primaryColor,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -428,8 +431,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: titleColor.withOpacity(0.54),
-                      fontSize: 14,
+                      color: bodyTextColor,
+                      fontSize: 13,
                     ),
                   ),
                 ],
@@ -437,7 +440,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: titleColor.withOpacity(0.54),
+              color: bodyTextColor.withOpacity(0.6),
               size: 16,
             ),
           ],
@@ -450,7 +453,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       String label, IconData icon, Color color, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      child: Padding(
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: Colors.grey.shade200, width: 0.8),
+          ),
+        ),
         padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           children: [
@@ -465,12 +474,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               style: TextStyle(
                 color: color,
                 fontWeight: FontWeight.w500,
+                fontSize: 16,
               ),
             ),
             const Spacer(),
             Icon(
               Icons.arrow_forward_ios,
-              color: color,
+              color: color.withOpacity(0.7),
               size: 16,
             ),
           ],

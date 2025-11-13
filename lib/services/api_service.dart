@@ -265,8 +265,9 @@ class ApiService {
         ));
 
     if (response.statusCode == 201) {
+      print('Response body: ${response.body}');
       final data = jsonDecode(response.body);
-      final createdOrder = Order.fromJson(data['data']['order']);
+      final createdOrder = Order.fromJson(data['data']);
 
       return createdOrder;
     } else {

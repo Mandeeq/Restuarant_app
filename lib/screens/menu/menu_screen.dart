@@ -86,8 +86,8 @@ class _MenuScreenState extends State<MenuScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Widget buildCategoryChip(
-        BuildContext context, String category, bool isSelected) {
+    Widget buildCategoryChip(BuildContext context, String category,
+        bool isSelected) {
       return Padding(
         padding: const EdgeInsets.only(right: 8),
         child: ChoiceChip(
@@ -100,15 +100,25 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
           selected: isSelected,
           onSelected: (_) => _onCategoryChanged(category),
-          selectedColor: Theme.of(context).colorScheme.primary,
+          selectedColor: Theme
+              .of(context)
+              .colorScheme
+              .primary,
           labelStyle: TextStyle(
             color: isSelected
                 ? Colors.white
-                : Theme.of(context).colorScheme.primary,
+                : Theme
+                .of(context)
+                .colorScheme
+                .primary,
             fontWeight: FontWeight.bold,
           ),
           backgroundColor:
-              Theme.of(context).colorScheme.primary.withOpacity(0.2),
+          Theme
+              .of(context)
+              .colorScheme
+              .primary
+              .withOpacity(0.2),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -194,195 +204,207 @@ class _MenuScreenState extends State<MenuScreen> {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(defaultPadding),
+      padding: EdgeInsets.all(defaultPadding), // already good
       itemCount: _menuItems.length,
       itemBuilder: (context, index) {
         final item = _menuItems[index];
         return Container(
-          margin: const EdgeInsets.only(bottom: 4),
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.red.shade400, width: 1),
-            ),
-            elevation: 0.3,
+          // ✅ Increased vertical spacing (was 4 → now 8)
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
             color: Colors.grey[100],
-            clipBehavior: Clip.antiAlias,
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MenuItemScreen(
-                      menuItem: item,
-                      onAddToCart: widget.onAddToCart,
-                    ),
-                  ),
-                );
-              },
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Food Image
-                  SizedBox(
-                    width: 140,
-                    height: 145,
-                    child: ClipRRect(
-                      child: Image(
-                        image: ImageUtils.getImageProvider(item.imageUrl),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.fastfood,
-                                size: 40, color: Colors.grey),
-                          );
-                        },
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            color: Colors.grey[200],
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
-                            ),
-                          );
-                        },
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+          BoxShadow(color: Colors.black12,
+          offset: const Offset(0, 2),
+          blurRadius: 8,
+          spreadRadius: 0,
+        ),
+            ],
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            // ✅ for proper ripple clipping
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      MenuItemScreen(
+                        menuItem: item,
+                        onAddToCart: widget.onAddToCart,
                       ),
+                ),
+              );
+            },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Food Image — ✅ Made square (140x140) for consistency
+                SizedBox(
+                  width: 140,
+                  height: 140,
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      bottomLeft: Radius.circular(16),
                     ),
-                  ),
-
-                  // Content Area
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Food Name
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // Food Name
-                              Expanded(
-                                child: Text(
-                                  item.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-
-                              // Rating and Reviews
-                              Row(
-                                children: [
-                                  _buildRatingStars(4.5),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '4.5(30)',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 6),
-
-                          // Description
-                          // Description with fixed min height for 3 lines
-                          Container(
-                            constraints: BoxConstraints(
-                                minHeight: 36), // Minimum height for 3 lines
-                            child: Text(
-                              item.description,
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[600],
-                                height: 1.3,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                    child: Image(
+                      image: ImageUtils.getImageProvider(item.imageUrl),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[200],
+                          child: const Icon(Icons.fastfood,
+                              size: 40, color: Colors.grey),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          color: Colors.grey[200],
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                                  : null,
+                              valueColor:
+                              AlwaysStoppedAnimation<Color>(primaryColor),
                             ),
                           ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
 
-                          const SizedBox(height: 8),
-
-                          // Price and Add Button
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Ksh ${item.price.toStringAsFixed(2)}",
-                                style: TextStyle(
+                // Content Area
+                Expanded(
+                  // ✅ Use defaultPadding (e.g., 16) instead of hardcoded 12
+                  child: Padding(
+                    padding: EdgeInsets.all(defaultPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Food Name & Rating
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                item.name,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.green[800],
+                                  fontSize: 16,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
+                            ),
+                            Row(
+                              children: [
+                                _buildRatingStars(4.5),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '4.5(30)',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
 
-                              // Add Button
-                              InkWell(
-                                onTap: () {
-                                  widget.onAddToCart(item);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content:
-                                          Text('Added ${item.name} to cart'),
-                                      action: SnackBarAction(
-                                        backgroundColor: Colors.red,
-                                        label: 'View Cart',
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const CartPage(),
-                                            ),
-                                          );
-                                        },
-                                      ),
+                        // ✅ Slightly increased gap (was 6 → 8)
+                        const SizedBox(height: 8),
+
+                        // Description
+                        // ✅ Keep min height, but use consistent line height
+                        Container(
+                          constraints: const BoxConstraints(minHeight: 36),
+                          child: Text(
+                            item.description,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[600],
+                              height: 1.4, // slightly tighter than 1.3
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+
+                        // ✅ Slightly increased gap (was 8 → 10)
+                        const SizedBox(height: 10),
+
+                        // Price and Add Button
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Ksh ${item.price.toStringAsFixed(2)}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                // ✅ Use primaryColor or theme color instead of green[800]
+                                color: primaryColor,
+                              ),
+                            ),
+                            InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () {
+                                widget.onAddToCart(item);
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Added ${item.name} to cart'),
+                                    backgroundColor: primaryColor,
+                                    duration: const Duration(seconds: 2),
+                                    action: SnackBarAction(
+                                      label: 'View Cart',
+                                      textColor: Colors.white,
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                            const CartPage(),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  );
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 6,
                                   ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red[400],
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: const Text(
-                                    '+ Add',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 14, // ✅ slightly wider
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: primaryColor,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: const Text(
+                                  '+ Add',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
