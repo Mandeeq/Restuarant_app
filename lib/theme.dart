@@ -4,7 +4,7 @@ import 'package:form_field_validator/form_field_validator.dart';
 // Color Palette (merged)
 const Color primaryColor = Color(0xFFF84440); // 🍅 Vibrant Red
 const Color secondaryColor = Color(0xFFFFC107); // 🌽 Golden Yellow
-const Color backgroundColor = Color.fromARGB(255, 207, 207, 207); // Warm off-white background
+const Color backgroundColor = Color.fromARGB(255, 236, 236, 236); // Warm off-white background
 const Color cardColor = Colors.white;
 
 // Legacy constants from constants.dart

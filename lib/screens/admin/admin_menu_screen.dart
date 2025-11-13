@@ -413,7 +413,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Image preview (show first image if available)
-              if (item.imageUrl.isNotEmpty && item.imageUrl.isNotEmpty)
+              if (item.imageUrl.isNotEmpty)
                 Column(
                   children: [
                     Container(
@@ -541,7 +541,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                           size: 16, color: Colors.grey[600]),
                       const SizedBox(width: 4),
                       Text(
-                        '${item.imageUrl.length} image(s)',
+                        '1 image(s)',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey[600],
@@ -600,20 +600,20 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _showDeleteConfirmation(item),
-                      icon: const Icon(Icons.delete, size: 16),
-                      label: const Text('Delete'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Expanded(
+                  //   child: OutlinedButton.icon(
+                  //     onPressed: () => _showDeleteConfirmation(item),
+                  //     icon: const Icon(Icons.delete, size: 16),
+                  //     label: const Text('Delete'),
+                  //     style: OutlinedButton.styleFrom(
+                  //       foregroundColor: Colors.red,
+                  //       side: const BorderSide(color: Colors.red),
+                  //       shape: RoundedRectangleBorder(
+                  //         borderRadius: BorderRadius.circular(8),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ],
@@ -680,13 +680,13 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     bool isAvailable = true;
     bool isFeatured = false;
     int preparationTime = 15;
-    String selectedImageUrl = '';
+    String imageUrl = ''; // For new item, image is initially empty
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _buildMenuItemForm(
+      builder: (context) => buildMenuItemForm(
         title: 'Add Menu Item',
         nameController: nameController,
         descriptionController: descriptionController,
@@ -695,8 +695,9 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
         isAvailable: isAvailable,
         isFeatured: isFeatured,
         preparationTime: preparationTime,
-        imageUrl: selectedImageUrl,
-        onSave: () async {
+        imageUrl: imageUrl,
+        onSave: (newImageUrl) async {
+          // Use newImageUrl from form
           try {
             final item = AdminMenuItem(
               id: '',
@@ -705,7 +706,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
               price: double.tryParse(priceController.text) ?? 0,
               category: selectedCategory,
               dietaryTags: [],
-              imageUrl: selectedImageUrl,
+              imageUrl: newImageUrl, // Use the URL from the form
               isFeatured: isFeatured,
               isAvailable: isAvailable,
               preparationTime: preparationTime,
@@ -742,13 +743,13 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     bool isAvailable = item.isAvailable;
     bool isFeatured = item.isFeatured;
     int preparationTime = item.preparationTime;
-    List<String> selectedImageUrls = List.from(item.imageUrl as Iterable);
+    String imageUrl = item.imageUrl;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _buildMenuItemForm(
+      builder: (context) => buildMenuItemForm(
         title: 'Edit Menu Item',
         nameController: nameController,
         descriptionController: descriptionController,
@@ -757,8 +758,8 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
         isAvailable: isAvailable,
         isFeatured: isFeatured,
         preparationTime: preparationTime,
-        imageUrl: selectedImageUrl,
-        onSave: () async {
+        imageUrl: imageUrl,
+        onSave: (newImageUrl) async {
           try {
             final updatedItem = AdminMenuItem(
               id: item.id,
@@ -767,7 +768,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
               price: double.tryParse(priceController.text) ?? 0,
               category: selectedCategory,
               dietaryTags: item.dietaryTags,
-              imageUrl: selectedImageUrl,
+              imageUrl: newImageUrl,
               isFeatured: isFeatured,
               isAvailable: isAvailable,
               preparationTime: preparationTime,
@@ -796,7 +797,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     );
   }
 
-  Widget _buildMenuItemForm({
+  Widget buildMenuItemForm({
     required String title,
     required TextEditingController nameController,
     required TextEditingController descriptionController,
@@ -806,10 +807,11 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     required bool isFeatured,
     required int preparationTime,
     required String imageUrl, // single image
-    required VoidCallback onSave,
+    required Future<void> Function(String newImageUrl) onSave,
   }) {
     return StatefulBuilder(
       builder: (context, setState) {
+        String currentFormImageUrl = imageUrl;
         return Container(
           height: MediaQuery.of(context).size.height * 0.9,
           decoration: const BoxDecoration(
@@ -873,7 +875,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                           const SizedBox(height: 8),
 
                           // Current Image Preview
-                          if (imageUrl.isNotEmpty)
+                          if (currentFormImageUrl.isNotEmpty)
                             Stack(
                               children: [
                                 Container(
@@ -882,7 +884,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(12),
                                     image: DecorationImage(
-                                      image: NetworkImage(imageUrl),
+                                      image: NetworkImage(currentFormImageUrl),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -893,7 +895,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                                   child: GestureDetector(
                                     onTap: () {
                                       setState(() {
-                                        imageUrl = '';
+                                        currentFormImageUrl = '';
                                       });
                                     },
                                     child: Container(
@@ -914,7 +916,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                             ),
 
                           // Upload Buttons (if no image yet)
-                          if (imageUrl.isEmpty)
+                          if (currentFormImageUrl.isEmpty)
                             Row(
                               children: [
                                 Expanded(
@@ -930,7 +932,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                                       if (picked != null) {
                                         final url = await ImageUploadService
                                             .uploadImage(File(picked.path));
-                                        setState(() => imageUrl = url);
+                                        setState(() => currentFormImageUrl = url);
                                       }
                                     },
                                     icon: const Icon(Icons.photo_library),
@@ -951,7 +953,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                                       if (photo != null) {
                                         final url = await ImageUploadService
                                             .uploadImage(File(photo.path));
-                                        setState(() => imageUrl = url);
+                                        setState(() => currentFormImageUrl = url);
                                       }
                                     },
                                     icon: const Icon(Icons.camera_alt),
@@ -994,7 +996,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        initialValue: selectedCategory,
+                        value: selectedCategory,
                         decoration: const InputDecoration(
                           labelText: 'Category',
                           border: OutlineInputBorder(),
@@ -1018,7 +1020,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                         children: [
                           Expanded(
                             child: DropdownButtonFormField<int>(
-                              initialValue: preparationTime,
+                              value: preparationTime,
                               decoration: const InputDecoration(
                                 labelText: 'Preparation Time (min)',
                                 border: OutlineInputBorder(),
@@ -1077,7 +1079,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: onSave,
+                    onPressed: () => onSave(currentFormImageUrl),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
@@ -1102,7 +1104,7 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     );
   }
 
-  void _showDeleteConfirmation(AdminMenuItem item) {
+  void showDeleteConfirmation(AdminMenuItem item) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -1142,5 +1144,3 @@ class _AdminMenuScreenState extends State<AdminMenuScreen> {
     );
   }
 }
-
-String selectedImageUrl = '';

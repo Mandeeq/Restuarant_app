@@ -139,7 +139,7 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             children: [
               // 🔹 Order Options (still static for now)
-              _buildOrderOptions(context),
+              //_buildOrderOptions(context),
 
               // 🔹 Featured Section
               _buildSectionTitle(context, "FEATURED TODAY"),
@@ -249,30 +249,30 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderOptions(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _buildActionCard(context,
-              icon: Icons.coffee,
-              label: "Coffee",
-              color: const Color(0xFF6F4E37)),
-          _buildActionCard(context,
-              icon: Icons.breakfast_dining,
-              label: "Breakfast",
-              color: const Color(0xFFFF9F1C)),
-          _buildActionCard(context,
-              icon: Icons.cake,
-              label: "Pastries",
-              color: const Color(0xFFFF6B6B)),
-          _buildActionCard(context,
-              icon: Icons.local_drink, label: "Specialty", color: primaryColor),
-        ],
-      ),
-    );
-  }
+  // Widget _buildOrderOptions(BuildContext context) {
+  //   return Padding(
+  //     padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+  //     child: Row(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       children: [
+  //         _buildActionCard(context,
+  //             icon: Icons.coffee,
+  //             label: "Coffee",
+  //             color: const Color(0xFF6F4E37)),
+  //         _buildActionCard(context,
+  //             icon: Icons.breakfast_dining,
+  //             label: "Breakfast",
+  //             color: const Color(0xFFFF9F1C)),
+  //         _buildActionCard(context,
+  //             icon: Icons.cake,
+  //             label: "Pastries",
+  //             color: const Color(0xFFFF6B6B)),
+  //         _buildActionCard(context,
+  //             icon: Icons.local_drink, label: "Specialty", color: primaryColor),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _buildFeaturedCard(BuildContext context, FeaturedItem item) {
     return GestureDetector(
