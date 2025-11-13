@@ -7,8 +7,8 @@ import '../payment/cart_page.dart';
 import 'menu_item_screen.dart';
 
 class MenuScreen extends StatefulWidget {
-  final List<String> cartItems;
-  final Function(String) onAddToCart;
+  final List<MenuItem> cartItems;
+  final Function(MenuItem) onAddToCart;
 
   const MenuScreen({
     super.key,
@@ -203,7 +203,7 @@ class _MenuScreenState extends State<MenuScreen> {
           child: Card(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.grey.shade400, width: 1),
+              side: BorderSide(color: Colors.red.shade400, width: 1),
             ),
             elevation: 0.3,
             color: Colors.grey[100],
@@ -216,7 +216,6 @@ class _MenuScreenState extends State<MenuScreen> {
                     builder: (context) => MenuItemScreen(
                       menuItem: item,
                       onAddToCart: widget.onAddToCart,
-                      cartItems: widget.cartItems,
                     ),
                   ),
                 );
@@ -336,19 +335,20 @@ class _MenuScreenState extends State<MenuScreen> {
                               // Add Button
                               InkWell(
                                 onTap: () {
-                                  widget.onAddToCart(item.name);
+                                  widget.onAddToCart(item);
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content:
                                           Text('Added ${item.name} to cart'),
                                       action: SnackBarAction(
+                                        backgroundColor: Colors.red,
                                         label: 'View Cart',
                                         onPressed: () {
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => CartPage(
-                                                  cartItems: widget.cartItems),
+                                              builder: (context) =>
+                                                  const CartPage(),
                                             ),
                                           );
                                         },

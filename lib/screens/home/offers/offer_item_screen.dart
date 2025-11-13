@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/home_model.dart';
 import '../../../utils/image_utils.dart';
-import '../../../theme.dart'; // Make sure this exports: primaryColor, backgroundColor, titleColor, bodyTextColor, defaultPadding
+import '../../../theme.dart'; // Ensure exports: primaryColor, backgroundColor, titleColor, bodyTextColor, defaultPadding
 
 class OfferItemScreen extends StatelessWidget {
   final Offer offer;
@@ -11,29 +11,23 @@ class OfferItemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = ImageUtils.getImageUrl(offer.imageUrl);
-    final imageProvider = (url.isNotEmpty && ImageUtils.isValidImageUrl(url))
-        ? NetworkImage(url) as ImageProvider
-        : const AssetImage('assets/images/placeholder.png');
-
     return Scaffold(
       backgroundColor: backgroundColor,
       body: CustomScrollView(
         slivers: [
-          // Hero SliverAppBar with full-bleed image
+          // Hero App Bar with Image (no overlay text or gradient — matches FeaturedItemScreen)
           SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.height * 0.45,
+            expandedHeight: MediaQuery.of(context).size.height * 0.4,
             pinned: true,
             backgroundColor: primaryColor,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Hero image
                   Hero(
                     tag: 'offer_${offer.id}',
                     child: Image(
-                      image: imageProvider,
+                      image: ImageUtils.getImageProvider(offer.imageUrl),
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -51,73 +45,20 @@ class OfferItemScreen extends StatelessWidget {
                         if (loadingProgress == null) return child;
                         return Container(
                           color: Colors.grey[200],
-                          child: const Center(
-                            child: CircularProgressIndicator.adaptive(),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                                  : null,
+                              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                            ),
                           ),
                         );
                       },
                     ),
                   ),
-                  // Gradient overlay for text readability
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.6),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Offer title overlay
-                  Positioned(
-                    bottom: 120,
-                    left: 24,
-                    right: 24,
-                    child: Text(
-                      offer.title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 8,
-                            color: Colors.black54,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  // "Limited Offer" badge
-                  Positioned(
-                    bottom: 80,
-                    left: 24,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.redAccent.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text(
-                        'LIMITED TIME',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // ✅ No gradient, no title overlay — clean like FeaturedItemScreen
                 ],
               ),
             ),
@@ -128,7 +69,7 @@ class OfferItemScreen extends StatelessWidget {
                   color: Colors.white.withOpacity(0.9),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.arrow_back, color: primaryColor),
+                child: const Icon(Icons.arrow_back, color: primaryColor),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -140,55 +81,48 @@ class OfferItemScreen extends StatelessWidget {
                     color: Colors.white.withOpacity(0.9),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.favorite_border, color: primaryColor),
+                  child: const Icon(Icons.shopping_cart, color: primaryColor),
                 ),
                 onPressed: () {
-                  // Optional: Add to favorites
+                  Navigator.pop(context); // or navigate to cart
                 },
               ),
             ],
           ),
 
-          // Content: Description + CTA
+          // Content Section — aligned with FeaturedItemScreen layout
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(defaultPadding),
+              padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Description Card
+                  // Title and Price Section
                   Container(
-                    padding: const EdgeInsets.all(defaultPadding),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          blurRadius: 12,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Title
                         Text(
-                          'Offer Details',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: titleColor,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          offer.description,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: bodyTextColor,
-                            height: 1.6,
+                          offer.title,
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            color: titleColor,
+                            fontWeight: FontWeight.bold,
                           ),
-                          textAlign: TextAlign.justify,
+                        ),
+                        const SizedBox(height: 8),
+
+                        // Price (if Offer model has `price`; otherwise omit or use `discountedPrice` etc.)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "Ksh ${offer.discountPercentage}",
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              color: primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -196,40 +130,78 @@ class OfferItemScreen extends StatelessWidget {
 
                   const SizedBox(height: defaultPadding),
 
-                  // Primary CTA Button
+                  // Description Section — styled like "About This Offer"
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      border: Border(left: BorderSide(color: primaryColor, width: 4)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Offer Details",
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: titleColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          offer.description.isNotEmpty
+                              ? offer.description
+                              : "No details available.",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: bodyTextColor,
+                            height: 1.6,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: defaultPadding * 2),
+
+                  // CTA Button — matches FeaturedItemScreen exactly
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: defaultPadding,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
-                        elevation: 3,
+                        elevation: 2,
                       ),
                       onPressed: () {
-                        // Trigger offer claim logic here
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('✅ Offer claimed: ${offer.title}!'),
+                            content: Text('Offer claimed: ${offer.title}!'),
                             backgroundColor: primaryColor,
-                            duration: const Duration(seconds: 2),
+                            action: SnackBarAction(
+                              label: 'Dismiss',
+                              textColor: Colors.white,
+                              onPressed: () {},
+                            ),
                           ),
                         );
-                        // Optionally: Navigator.push(...) or show dialog
                       },
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Icon(Icons.local_offer, size: 20),
-                          SizedBox(width: 10),
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.local_offer, size: 20),
+                          const SizedBox(width: 8),
                           Text(
-                            'Redeem This Offer',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
+                            "Claim This Offer - Ksh. ${offer.discountPercentage}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -237,7 +209,7 @@ class OfferItemScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: defaultPadding * 2),
+                  const SizedBox(height: defaultPadding),
                 ],
               ),
             ),

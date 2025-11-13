@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/home_model.dart';
 import '../../../utils/image_utils.dart';
-import '../../../theme.dart'; // assuming you have theme constants like primaryColor, etc.
+import '../../../theme.dart';
 
 class FeaturedItemScreen extends StatelessWidget {
   final FeaturedItem item;
@@ -11,18 +11,13 @@ class FeaturedItemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = ImageUtils.getImageUrl(item.imageUrl);
-    final imageProvider = (url.isNotEmpty && ImageUtils.isValidImageUrl(url))
-        ? NetworkImage(url)
-        : const AssetImage('assets/images/placeholder.png') as ImageProvider;
-
     return Scaffold(
       backgroundColor: backgroundColor,
       body: CustomScrollView(
         slivers: [
           // Hero App Bar with Image
           SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.height * 0.45,
+            expandedHeight: MediaQuery.of(context).size.height * 0.4,
             pinned: true,
             backgroundColor: primaryColor,
             flexibleSpace: FlexibleSpaceBar(
@@ -32,7 +27,7 @@ class FeaturedItemScreen extends StatelessWidget {
                   Hero(
                     tag: 'featuredItem_${item.id}',
                     child: Image(
-                      image: imageProvider,
+                      image: ImageUtils.getImageProvider(item.imageUrl),
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -50,72 +45,20 @@ class FeaturedItemScreen extends StatelessWidget {
                         if (loadingProgress == null) return child;
                         return Container(
                           color: Colors.grey[200],
-                          child: const Center(
-                            child: CircularProgressIndicator.adaptive(),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                                  : null,
+                              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                            ),
                           ),
                         );
                       },
                     ),
                   ),
-                  // Dark gradient overlay for text contrast
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.55),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Title overlay on image (optional but elegant)
-                  Positioned(
-                    bottom: 120,
-                    left: 24,
-                    right: 24,
-                    child: Text(
-                      item.title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 8,
-                            color: Colors.black54,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  // Price overlay (subtle)
-                  Positioned(
-                    bottom: 80,
-                    left: 24,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.85),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        'Ksh. ${item.price.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // No gradient overlay – matches MenuItemScreen design
                 ],
               ),
             ),
@@ -150,43 +93,35 @@ class FeaturedItemScreen extends StatelessWidget {
           // Content Section
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(defaultPadding),
+              padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Description Card
+                  // Title and Price Section
                   Container(
-                    padding: const EdgeInsets.all(defaultPadding),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Title
                         Text(
-                          'About This Offer',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: titleColor,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          item.title,
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            color: titleColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        Text(
-                          item.subtitle.isNotEmpty
-                              ? item.subtitle
-                              : 'No additional details available.',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: bodyTextColor,
-                            height: 1.6,
+                        const SizedBox(height: 8),
+
+                        // Price
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "Ksh ${item.price.toStringAsFixed(2)}",
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              color: primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ],
@@ -195,26 +130,65 @@ class FeaturedItemScreen extends StatelessWidget {
 
                   const SizedBox(height: defaultPadding),
 
-                  // CTA Button
+                  // Description Section
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      border: Border(left: BorderSide(color: primaryColor, width: 4)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "About This Offer",
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: titleColor,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          item.subtitle.isNotEmpty
+                              ? item.subtitle
+                              : "No additional details available.",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: bodyTextColor,
+                            height: 1.6,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: defaultPadding * 2),
+
+                  // CTA Button (styled like "Add to Cart")
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: defaultPadding,
+                        ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
                         ),
                         elevation: 2,
                       ),
                       onPressed: () {
-                        // You can add logic here (e.g., show dialog, navigate, etc.)
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Offer claimed: ${item.title}!'),
                             backgroundColor: primaryColor,
-                            duration: const Duration(seconds: 2),
+                            action: SnackBarAction(
+                              label: 'Dismiss',
+                              textColor: Colors.white,
+                              onPressed: () {},
+                            ),
                           ),
                         );
                       },
@@ -224,10 +198,10 @@ class FeaturedItemScreen extends StatelessWidget {
                           const Icon(Icons.local_offer, size: 20),
                           const SizedBox(width: 8),
                           Text(
-                            'Claim This Offer',
+                            "Claim This Offer - Ksh. ${item.price.toStringAsFixed(2)}",
                             style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
@@ -235,7 +209,7 @@ class FeaturedItemScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: defaultPadding * 2),
+                  const SizedBox(height: defaultPadding),
                 ],
               ),
             ),

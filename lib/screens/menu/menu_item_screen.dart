@@ -6,14 +6,12 @@ import '../../utils/image_utils.dart';
 
 class MenuItemScreen extends StatelessWidget {
   final MenuItem menuItem;
-  final Function(String)? onAddToCart;
-  final List<String> cartItems;
+  final Function(MenuItem)? onAddToCart;
 
   const MenuItemScreen({
     super.key,
     required this.menuItem,
     this.onAddToCart,
-    this.cartItems = const [],
   });
 
   @override
@@ -345,7 +343,7 @@ class MenuItemScreen extends StatelessWidget {
                       ),
                       onPressed: () {
                         if (onAddToCart != null) {
-                          onAddToCart!(menuItem.name);
+                          onAddToCart!(menuItem);
                         }
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import '../../../models/home_model.dart';
 import '../../../utils/image_utils.dart';
-import '../../../theme.dart'; // Ensure this exports: primaryColor, backgroundColor, titleColor, bodyTextColor, defaultPadding
+import '../../../theme.dart'; // Ensure exports: primaryColor, backgroundColor, titleColor, bodyTextColor, defaultPadding
 
 class PopularItemScreen extends StatelessWidget {
   final PopularItem item;
@@ -11,29 +11,23 @@ class PopularItemScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final url = ImageUtils.getImageUrl(item.imageUrl);
-    final imageProvider = (url.isNotEmpty && ImageUtils.isValidImageUrl(url))
-        ? NetworkImage(url) as ImageProvider
-        : const AssetImage('assets/images/placeholder.png');
-
     return Scaffold(
       backgroundColor: backgroundColor,
       body: CustomScrollView(
         slivers: [
-          // Hero SliverAppBar with food image
+          // Hero App Bar with Image — clean, no overlays (matches featured/offer screens)
           SliverAppBar(
-            expandedHeight: MediaQuery.of(context).size.height * 0.45,
+            expandedHeight: MediaQuery.of(context).size.height * 0.4,
             pinned: true,
             backgroundColor: primaryColor,
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  // Hero image for smooth transition
                   Hero(
                     tag: 'popular_${item.id}',
                     child: Image(
-                      image: imageProvider,
+                      image: ImageUtils.getImageProvider(item.imageUrl),
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) {
                         return Container(
@@ -51,72 +45,20 @@ class PopularItemScreen extends StatelessWidget {
                         if (loadingProgress == null) return child;
                         return Container(
                           color: Colors.grey[200],
-                          child: const Center(
-                            child: CircularProgressIndicator.adaptive(),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                                  : null,
+                              valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                            ),
                           ),
                         );
                       },
                     ),
                   ),
-                  // Dark gradient for text contrast
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.55),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Item name overlay
-                  Positioned(
-                    bottom: 120,
-                    left: 24,
-                    right: 24,
-                    child: Text(
-                      item.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 8,
-                            color: Colors.black54,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  // Price badge
-                  Positioned(
-                    bottom: 80,
-                    left: 24,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.9),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        'Ksh. ${item.price.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // ✅ No gradient, no text overlay — clean image like Featured & Offer screens
                 ],
               ),
             ),
@@ -127,7 +69,7 @@ class PopularItemScreen extends StatelessWidget {
                   color: Colors.white.withOpacity(0.9),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.arrow_back, color: primaryColor),
+                child: const Icon(Icons.arrow_back, color: primaryColor),
               ),
               onPressed: () => Navigator.pop(context),
             ),
@@ -139,97 +81,136 @@ class PopularItemScreen extends StatelessWidget {
                     color: Colors.white.withOpacity(0.9),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(Icons.shopping_cart, color: primaryColor),
+                  child: const Icon(Icons.shopping_cart, color: primaryColor),
                 ),
                 onPressed: () {
-                  // Navigate to cart or add item
+                  Navigator.pop(context); // or navigate to cart
                 },
               ),
             ],
           ),
 
-          // Content: Description + CTA
+          // Content Section — identical layout to FeaturedItemScreen & OfferItemScreen
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(defaultPadding),
+              padding: const EdgeInsets.symmetric(horizontal: defaultPadding),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Description Card
+                  // Title and Price Section
                   Container(
-                    padding: const EdgeInsets.all(defaultPadding),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.06),
-                          blurRadius: 12,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Title (item.name)
                         Text(
-                          'About This Dish',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                color: titleColor,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          item.name,
+                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            color: titleColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        // Text(
-                        //   item.description ?? 'Delicious and freshly prepared.',
-                        //   style: TextStyle(
-                        //     fontSize: 16,
-                        //     color: bodyTextColor,
-                        //     height: 1.6,
-                        //   ),
-                        //   textAlign: TextAlign.justify,
-                        // ),
+                        const SizedBox(height: 8),
+
+                        // Price
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            "Ksh ${item.price.toStringAsFixed(2)}",
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              color: primaryColor,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
 
                   const SizedBox(height: defaultPadding),
 
-                  // Add to Cart Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      icon: const Icon(Icons.add_shopping_cart, size: 20),
-                      label: const Text(
-                        'Add to Cart',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 3,
-                      ),
-                      onPressed: () {
-                        // Add to cart logic here
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('✅ Added to cart: ${item.name}!'),
-                            backgroundColor: primaryColor,
-                            duration: const Duration(seconds: 2),
+                  // Description Section — styled like "About This Dish"
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      border: Border(left: BorderSide(color: primaryColor, width: 4)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "About This Dish",
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: titleColor,
+                            fontWeight: FontWeight.bold,
                           ),
-                        );
-                      },
+                        ),
+                        const SizedBox(height: 12),
+                        // Text(
+                        //   item.description.isNotEmpty
+                        //       ? item.description
+                        //       : "Delicious and freshly prepared.",
+                        //   style: TextStyle(
+                        //     fontSize: 12,
+                        //     color: bodyTextColor,
+                        //     height: 1.6,
+                        //   ),
+                        // ),
+                      ],
                     ),
                   ),
 
                   const SizedBox(height: defaultPadding * 2),
+
+                  // CTA Button — identical to FeaturedItemScreen
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: defaultPadding,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 2,
+                      ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Added to cart: ${item.name}!'),
+                            backgroundColor: primaryColor,
+                            action: SnackBarAction(
+                              label: 'Dismiss',
+                              textColor: Colors.white,
+                              onPressed: () {},
+                            ),
+                          ),
+                        );
+                        // TODO: Add actual cart logic
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.add_shopping_cart, size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            "Add to Cart - Ksh. ${item.price.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: defaultPadding),
                 ],
               ),
             ),

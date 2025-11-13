@@ -30,7 +30,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
-    double totalAmount = cart.getTotal() + _deliveryCharge;
+    double totalAmount = cart.total + _deliveryCharge;
     int totalItems = cart.items.length;
 
     return Scaffold(
@@ -71,11 +71,11 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       color: primaryColor,
                                     ),
                                     title: Text(
-                                      cart.items[index],
+                                      cart.items[index].name,
                                       style: TextStyle(color: titleColor),
                                     ),
                                     trailing: Text(
-                                      'Ksh ${(cart.getItemPrice(cart.items[index]) * 150).toStringAsFixed(0)}',
+                                      'Ksh ${(cart.items[index].price * 150).toStringAsFixed(0)}',
                                       style: TextStyle(
                                         fontWeight: FontWeight.w600,
                                         color: primaryColor,

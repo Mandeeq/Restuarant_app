@@ -56,7 +56,7 @@ class _EntryPointState extends State<EntryPoint> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CartPage(cartItems: [],),
+                    builder: (context) => const CartPage(),
                   ),
                 );
               },
